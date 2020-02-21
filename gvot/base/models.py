@@ -184,7 +184,7 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
         "Le formulaire n'est pas accessible sans un uuid valable"
         raise Http404
 
-    @route(r'(?P<uuid>'+ UUIDConverter.regex +')')
+    @route(r'(?P<uuid>' + UUIDConverter.regex + ')')
     def uuid_way(self, request, uuid, *args, **kwargs):
         pouvoir = get_object_or_404(Pouvoir, uuid=uuid)
         return pouvoir.scrutin.serve(request, *args, **kwargs)
@@ -208,19 +208,16 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
 
         context = self.get_context(request)
         context['form'] = form
-        return render(
-            request,
-            self.get_template(request),
-            context,
-        )
+        return render(request, self.get_template(request), context,)
 
     def get_form(self, *args, **kwargs):
         form_class = self.get_form_class()
         pouvoir = kwargs.pop('pouvoir')
-        vote = self.get_submission_class().objects.filter(
-            pouvoir=pouvoir,
-            page=self,
-        ).first()
+        vote = (
+            self.get_submission_class()
+            .objects.filter(pouvoir=pouvoir, page=self,)
+            .first()
+        )
         if vote:
             initial = json.loads(vote.form_data)
             return form_class(*args, initial=initial, **kwargs)
@@ -230,7 +227,7 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
         self.get_submission_class().objects.update_or_create(
             pouvoir=pouvoir,
             page=self,
-            defaults = {
+            defaults={
                 'form_data': json.dumps(
                     form.cleaned_data, cls=DjangoJSONEncoder
                 ),
@@ -252,11 +249,9 @@ class Pouvoir(models.Model):
 
     panels = [
         FieldPanel('scrutin'),
-        MultiFieldPanel([
-            FieldRowPanel([
-                FieldPanel('nom'),
-                FieldPanel('prenom'),
-            ])], "Identité"
+        MultiFieldPanel(
+            [FieldRowPanel([FieldPanel('nom'), FieldPanel('prenom')])],
+            "Identité",
         ),
         FieldPanel('courriel'),
     ]

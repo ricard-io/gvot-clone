@@ -12,7 +12,6 @@ from email.utils import getaddresses
 
 from . import base_dir, env, root_dir
 from .gvot import *
-from .gvot import *
 
 # ENVIRONMENT VARIABLES AND PATHS
 # ------------------------------------------------------------------------------
@@ -232,7 +231,9 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # ADMIN
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/stable/ref/settings/#admins
-ADMINS = getaddresses([env('ADMINS', default='Cliss XXI <francois.poulain@cliss21.org>')])
+ADMINS = getaddresses(
+    [env('ADMINS', default='Cliss XXI <francois.poulain@cliss21.org>')]
+)
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#managers
 MANAGERS = ADMINS
