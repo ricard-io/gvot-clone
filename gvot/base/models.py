@@ -1,8 +1,10 @@
+import json
 import uuid
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls.converters import UUIDConverter
 
 from modelcluster.fields import ParentalKey
@@ -18,6 +20,7 @@ from wagtail.contrib.forms.models import (
     FORM_FIELD_CHOICES,
     AbstractEmailForm,
     AbstractFormField,
+    AbstractFormSubmission,
 )
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.core.fields import RichTextField, StreamField
@@ -102,7 +105,12 @@ class FormField(AbstractFormField):
     )
 
 
+class Vote(AbstractFormSubmission):
+    pouvoir = models.ForeignKey('Pouvoir', on_delete=models.CASCADE)
+
+
 # FIXME: s/Formulaire/Scrutin
+# FIXME: considérer scrutin ouvert ou pas (si pas: pas de post et formulare desactivé).
 class Formulaire(RoutablePageMixin, AbstractEmailForm):
     """
     Elle sert à publier un formulaire pour une inscription à un évènement,
@@ -181,19 +189,77 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
         pouvoir = get_object_or_404(Pouvoir, uuid=uuid)
         return pouvoir.scrutin.serve(request, *args, **kwargs)
 
+    def serve(self, request, *args, **kwargs):
+        _, _, path_args = self.resolve_subpage(request.path)
+        pouvoir = get_object_or_404(Pouvoir, uuid=path_args['uuid'])
+
+        if request.method == 'POST':
+            form = self.get_form(
+                request.POST, request.FILES, page=self, pouvoir=pouvoir
+            )
+
+            if form.is_valid():
+                submission = self.process_form_submission(form, pouvoir)
+                return self.render_landing_page(
+                    request, submission, *args, **kwargs
+                )
+        else:
+            form = self.get_form(pouvoir=pouvoir)
+
+        context = self.get_context(request)
+        context['form'] = form
+        return render(
+            request,
+            self.get_template(request),
+            context,
+        )
+
+    def get_form(self, *args, **kwargs):
+        form_class = self.get_form_class()
+        pouvoir = kwargs.pop('pouvoir')
+        vote = self.get_submission_class().objects.filter(
+            pouvoir=pouvoir,
+            page=self,
+        ).first()
+        if vote:
+            initial = json.loads(vote.form_data)
+            return form_class(*args, initial=initial, **kwargs)
+        return form_class(*args, **kwargs)
+
+    def process_form_submission(self, form, pouvoir):
+        self.get_submission_class().objects.update_or_create(
+            pouvoir=pouvoir,
+            page=self,
+            defaults = {
+                'form_data': json.dumps(
+                    form.cleaned_data, cls=DjangoJSONEncoder
+                ),
+            },
+        )
+
+    def get_submission_class(self):
+        return Vote
+
 
 class Pouvoir(models.Model):
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
-    scrutin = models.ForeignKey(Formulaire, on_delete=models.CASCADE)
+    scrutin = models.ForeignKey('Formulaire', on_delete=models.CASCADE)
     nom = models.CharField(max_length=100)
     prenom = models.CharField('Prénom', max_length=100)
     courriel = models.EmailField()
 
     panels = [
         FieldPanel('scrutin'),
-        FieldPanel('nom'),
-        FieldPanel('prenom'),
+        MultiFieldPanel([
+            FieldRowPanel([
+                FieldPanel('nom'),
+                FieldPanel('prenom'),
+            ])], "Identité"
+        ),
         FieldPanel('courriel'),
     ]
+
+    def __str__(self):
+        return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
