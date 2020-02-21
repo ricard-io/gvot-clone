@@ -10,7 +10,7 @@
     </div>
 
     <article>
-      <form class="p-3" action="{% pageurl page %}" method="post">
+      <form class="p-3" action="" method="post">
         {% csrf_token %}
         <div class="invalid-feedback">
           {{ form.non_field_errors }}

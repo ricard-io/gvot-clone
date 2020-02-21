@@ -1,5 +1,9 @@
+import uuid
+
 from django.db import models
 from django.http import Http404
+from django.shortcuts import get_object_or_404
+from django.urls.converters import UUIDConverter
 
 from modelcluster.fields import ParentalKey
 from wagtail.admin.edit_handlers import (
@@ -15,6 +19,7 @@ from wagtail.contrib.forms.models import (
     AbstractEmailForm,
     AbstractFormField,
 )
+from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Page
 from wagtail.search import index
@@ -92,7 +97,8 @@ class FormField(AbstractFormField):
     )
 
 
-class Formulaire(AbstractEmailForm):
+# FIXME: s/Formulaire/Scrutin
+class Formulaire(RoutablePageMixin, AbstractEmailForm):
     """
     Elle sert à publier un formulaire pour une inscription à un évènement,
     une newsletter, etc. ou n'importe quelle récolte de données simples.
@@ -158,4 +164,31 @@ class Formulaire(AbstractEmailForm):
 
     search_fields = Page.search_fields + [
         index.SearchField('introduction'),
+    ]
+
+    @route(r'^$')
+    def no_way(self, request, *args, **kwargs):
+        "Le formulaire n'est pas accessible sans un uuid valable"
+        raise Http404
+
+    @route(r'(?P<uuid>'+ UUIDConverter.regex +')')
+    def uuid_way(self, request, uuid, *args, **kwargs):
+        pouvoir = get_object_or_404(Pouvoir, uuid=uuid)
+        return pouvoir.scrutin.serve(request, *args, **kwargs)
+
+
+class Pouvoir(models.Model):
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
+    scrutin = models.ForeignKey(Formulaire, on_delete=models.CASCADE)
+    nom = models.CharField(max_length=100)
+    prenom = models.CharField('Prénom', max_length=100)
+    courriel = models.EmailField()
+
+    panels = [
+        FieldPanel('scrutin'),
+        FieldPanel('nom'),
+        FieldPanel('prenom'),
+        FieldPanel('courriel'),
     ]
