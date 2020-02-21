@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GvoT - Guide des styles</title>
+
+    <!-- Load Highlight.js CSS only. -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
+
+    <link rel="stylesheet" href="/static/css/app.css">
+    <link rel="stylesheet" href="/static/css/fork-awesome.css">
+
+    <!-- Style guide-specific CSS. -->
+    <style>
+    /* Side menu with sections */
+    .sg-side-menu {
+      position: sticky;
+      top: 0;
+      margin-left: 1rem;
+    }
+
+    /* Individual sections of the style guide */
+    .ss-section:not(:last-child) {
+      padding-bottom: 4rem;
+      border-bottom: 2px solid #f8f9fa;
+      margin-bottom: 4rem;
+    }
+
+    /* Code blocks used for examples */
+    .ss-code pre {
+      margin-bottom: 0;
+    }
+    .ss-code code {
+      display: block;
+      padding: 1.5rem;
+      overflow-x: auto;
+      background-color: #f8f9fa;
+    }
+
+    /* Output of code blocks used for examples */
+    .ss-code-live {
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 3px solid #f8f9fa;
+    }
+    </style>
+  </head>
+  <body>
+
+    <header class="jumbotron sg-header">
+      <div class="container">
+        <h1>GvoT<small class="text-muted"> : Guide des styles</small></h1>
+        <p class="lead">Ce guide des styles ne documente que les composants ou autres styles propres à l'application. Pour plus de détails sur l'utilisation du framework Bootstrap et de ses composants, consultez la documentation. Une page donne également un aperçu des composants principaux de Bootstrap mis en forme pour l'application.</p>
+        <hr class="my-4">
+        <a class="btn btn-primary btn-lg" href="https://getbootstrap.com/docs/" role="button">
+          <i class="fa fa-life-ring mr-2"></i>
+          Documentation de Bootstrap
+        </a>
+        <a class="btn btn-primary btn-lg" href="preview.html" role="button">
+          <i class="fa fa-eye mr-2"></i>
+          Aperçu des composants
+        </a>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="row">
+
+        <div class="col col-md-4 col-lg-3">
+          <ul class="nav flex-column sg-side-menu">
+
+            {{#each pages}}
+              <li class="nav-item">
+                <a class="nav-link" href="#{{ anchor }}">{{ title }}</a>
+              </li>
+            {{/each}}
+
+          </ul>
+        </div>
+
+        <div class="col col-md-8 col-lg-9">
+          {{#each pages}}
+            <section class="ss-section" id="{{ anchor }}">
+              {{ body }}
+            </section>
+          {{/each}}
+        </div>
+
+      </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>

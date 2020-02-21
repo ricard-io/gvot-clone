@@ -1,0 +1,9 @@
+{% extends "./_baseblock.html" %}
+{% load wagtailcore_tags %}
+
+{% block interieur %}
+  <{{ value.niveau }}>
+    <a class="anchor" id="{{ value.texte|slugify }}"></a>{{ value.texte }}
+  </{{ value.niveau }}>
+{% endblock %}
+

@@ -1,0 +1,11 @@
+# Django
+# ------------------------------------------------------------------------------
+django >=2.2,<2.3  # https://www.djangoproject.com/
+django-environ ==0.4.5  # https://github.com/joke2k/django-environ
+django-widget-tweaks
+
+# Wagtail
+# ------------------------------------------------------------------------------
+wagtail >=2.7,<2.8  # https://wagtail.io
+wagtailembedpeertube # https://forge.cliss21.org/cliss21/wagtailembedpeertube
+wagtailmenus >=3.0,<3.1  # https://github.com/rkhleics/wagtailmenus

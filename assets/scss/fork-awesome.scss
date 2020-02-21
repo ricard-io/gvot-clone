@@ -1,0 +1,12 @@
+@charset "utf-8";
+
+// Configuration and helpers
+@import "abstracts/variables";
+
+// Fork Awesome
+// ------------
+// @link https://forkawesome.github.io/
+
+$fa-font-path: "#{$font-path}/fork-awesome";
+
+@import "fork-awesome/scss/fork-awesome";

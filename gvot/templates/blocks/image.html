@@ -1,0 +1,22 @@
+{% extends "./_baseblock.html" %}
+{% load wagtailimages_tags %}
+
+{% block margin %}mb-4{% endblock %}
+
+{% block interieur %}
+<div class="text-center">
+  <figure class="figure mx-auto">
+    {% if value.lien %}
+      <a href="{{ href }}">
+    {% endif %}
+    {% image value.image max-1200x1200 class="figure-img img-fluid" width="auto" height="auto" %}
+    {% if value.lien %}
+      </a>
+    {% endif %}
+    {% if value.legende %}
+      <figcaption class="figure-caption">{{ value.legende }}</figcaption>
+    {% endif %}
+  </figure>
+</div>
+{% endblock %}
+

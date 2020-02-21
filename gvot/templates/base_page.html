@@ -1,0 +1,19 @@
+{% extends 'base.html' %}<!DOCTYPE html>
+{% load wagtailuserbar menu_tags %}
+
+{% block title %}{{ page.seo_title|default:page.title }}{% endblock %}
+
+{% block meta %}
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+{% endblock %}
+
+{% block precontainer %}
+  {% include 'menus/top_menu.html' %}
+  {% wagtailuserbar %}
+{% endblock %}
+
+{% block postcontainer %}
+  {% include 'menus/footer_menu.html' %}
+{% endblock %}
+

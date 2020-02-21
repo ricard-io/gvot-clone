@@ -1,0 +1,32 @@
+{
+  "root": true,
+  "parser": "babel-eslint",
+  "extends": [
+    "xo/esnext",
+    "xo/browser"
+  ],
+  "rules": {
+    "capitalized-comments": "off",
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "max-params": [
+      "warn",
+      5
+    ],
+    "multiline-ternary": [
+      "error",
+      "always-multiline"
+    ],
+    "new-cap": "off",
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "prefer-destructuring": "off"
+  }
+}

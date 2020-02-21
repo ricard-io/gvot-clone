@@ -1,0 +1,42 @@
+# Editors
+*~
+*.sw[po]
+
+# Python
+*.py[cod]
+__pycache__
+
+# Virtual environment
+.env
+venv
+
+# Logs
+logs
+*.log
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+htmlcov
+
+# Translations
+*.mo
+*.pot
+
+# NPM
+node_modules/
+
+# Databases
+sqlite.db
+
+# Local configuration
+config.env
+
+# Local overrides and variable content
+local/
+var/
+
+# Asset builds hidden in developp branch
+gvot/static/

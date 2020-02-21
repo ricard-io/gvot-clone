@@ -1,0 +1,3 @@
+-r base.txt
+
+# PRECAUTION: avoid production dependencies that aren't in development.

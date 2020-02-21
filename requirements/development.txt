@@ -1,0 +1,20 @@
+-r base.txt
+
+# Testing
+# ------------------------------------------------------------------------------
+pytest  # https://github.com/pytest-dev/pytest
+pytest-sugar  # https://github.com/Frozenball/pytest-sugar
+
+# Code quality
+# ------------------------------------------------------------------------------
+black; python_version>'3.5'  # https://github.com/python/black
+flake8 >=3.5.0  # https://github.com/pycqa/flake8
+isort  # https://github.com/timothycrosley/isort
+pytest-cov  # https://github.com/pytest-dev/pytest-cov
+
+# Django
+# ------------------------------------------------------------------------------
+django-debug-toolbar  # https://github.com/jazzband/django-debug-toolbar
+django-extensions  # https://github.com/django-extensions/django-extensions
+
+pytest-django  # https://github.com/pytest-dev/pytest-django

@@ -1,0 +1,14 @@
+{% extends "./formulaire.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block inner_content %}
+  <div class="p-5 lead">
+    {{ page.confirmation | richtext }}
+  </div>
+  <div>
+    <a class="btn btn-primary btn-lg btn-block" href="/">
+      Retour à l'accueil
+    </a>
+  </div>
+{% endblock %}
+

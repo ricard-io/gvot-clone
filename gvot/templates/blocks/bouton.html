@@ -1,0 +1,8 @@
+{% extends "./_baseblock.html" %}
+
+{% block interieur %}
+  <p class="text-center">
+    <a class="btn btn-{% if value.outline %}outline-{% endif %}primary" href="{{ href }}">{{ value.texte }}</a>
+  </p>
+{% endblock %}
+

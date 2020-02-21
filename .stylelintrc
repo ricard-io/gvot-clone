@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "stylelint-config-twbs-bootstrap/scss"
+  ],
+  "rules": {
+    "value-list-comma-newline-after": "always-multi-line",
+    "value-list-comma-newline-before": "never-multi-line",
+    "value-list-comma-space-after": "always-single-line",
+    "scss/at-function-named-arguments": null,
+    "scss/dollar-variable-default": null
+  }
+}

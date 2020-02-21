@@ -1,0 +1,21 @@
+@charset "utf-8";
+
+// Configuration and helpers
+@import "abstracts/variables";
+@import "abstracts/variables-bootstrap";
+
+// Vendors
+@import "vendor/bootstrap";
+
+// Base styles
+@import "base/fonts";
+
+// Layout-related sections
+//@import "layout/header";
+//@import "layout/footer";
+
+// Components
+@import "components/forms";
+
+// Page-specific styles
+//@import "pages/home";

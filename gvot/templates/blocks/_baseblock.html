@@ -1,0 +1,9 @@
+{% load wagtailcore_tags %}
+
+{% block exterieur %}
+  <div class="block block-{{ block_type }}">
+    {% block interieur %}
+    {% endblock %}
+  </div>
+{% endblock %}
+

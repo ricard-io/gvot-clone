@@ -1,0 +1,53 @@
+{% load i18n %}
+<table class="listing">
+  <col width="33%"/>
+  <col width="33%"/>
+  <col width="33%"/>
+  <thead>
+    <tr>
+      <th class="title">{% trans "Title" %}</th>
+      <th class="type">Résultats</th>
+      <th class="type">{% trans "Updated" %}</th>
+      <th class="type">Péremption</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for fp in form_pages reversed %}
+      {% with fp.formsubmission_set.all as submissions %}
+        {% with submissions.last.submit_time as last_submit_time %}
+        <tr>
+          <td class="title">
+            <h2><a href="{% url 'wagtailadmin_pages:edit' fp.id %}">{{ fp|capfirst }}</a></h2>
+          </td>
+          <td class="type">
+            <a href="{% url 'wagtailforms:list_submissions' fp.id %}" class="nolink">
+              <strong>{{ submissions.count }}</strong> réponse{{ submissions.count|pluralize }}
+            </a>
+          </td>
+          <td class="type">
+              {% if last_submit_time %}
+                <div class="human-readable-date" title="{{ last_submit_time|date:"d M Y H:i" }}">{% blocktrans with time_period=last_submit_time|timesince %}{{ time_period }} ago{% endblocktrans %}</div>
+              {% else %}
+                jamais
+              {% endif %}
+            </a>
+          </td>
+          <td class="type">
+            {% with peremption=fp.specific.peremption %}
+              <div class="human-readable-date" title="{{ peremption|date:"d M Y" }}">
+                {% now "Ymd" as today %}
+                {% if peremption|date:"Ymd" > today %}
+                  dans {{ peremption|timeuntil }}
+                {% else %}
+                  {% blocktrans with time_period=peremption|timesince %}{{ time_period }} ago{% endblocktrans %}
+                {% endif %}
+              </div>
+            {% endwith %}
+          </td>
+        </tr>
+        {% endwith %}
+      {% endwith %}
+    {% endfor %}
+  </tbody>
+</table>
+

@@ -1,0 +1,33 @@
+{% extends "./site_page.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+  <h1>{{ page.title }}</h1>
+
+  {% block inner_content %}
+    <div class="p-5 lead">
+      {{ page.introduction|richtext }}
+    </div>
+
+    <article>
+      <form class="p-3" action="{% pageurl page %}" method="post">
+        {% csrf_token %}
+        <div class="invalid-feedback">
+          {{ form.non_field_errors }}
+        </div>
+        {% for field in form %}
+          {% include "./includes/formfield.html" with label_class="h3" collapse=False %}
+        {% endfor %}
+        <div>
+          <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
+        </div>
+      </form>
+    </article>
+  {% endblock %}
+
+  <div class="py-2 px-3">
+    <h2 class="mt-5">Protection des données personnelles</h2>
+    {{ page.prescription|richtext }}
+  </div>
+{% endblock %}
+
