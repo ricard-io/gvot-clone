@@ -181,8 +181,11 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
 
     @route(r'^$')
     def no_way(self, request, *args, **kwargs):
-        "Le formulaire n'est pas accessible sans un uuid valable"
+        "Sauf en preview, le formulaire n'est pas accessible sans uuid valable"
+        if request.is_preview:
+            return super().serve(request, *args, **kwargs)
         raise Http404
+
 
     @route(r'(?P<uuid>' + UUIDConverter.regex + ')')
     def uuid_way(self, request, uuid, *args, **kwargs):
@@ -212,7 +215,7 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
 
     def get_form(self, *args, **kwargs):
         form_class = self.get_form_class()
-        pouvoir = kwargs.pop('pouvoir')
+        pouvoir = kwargs.pop('pouvoir', None)
         vote = (
             self.get_submission_class()
             .objects.filter(pouvoir=pouvoir, page=self,)
