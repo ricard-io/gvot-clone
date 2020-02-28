@@ -8,7 +8,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0004_formulaires'),
+        ('base', '0004_scrutins'),
     ]
 
     operations = [
@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('nom', models.CharField(max_length=100)),
                 ('prenom', models.CharField(max_length=100, verbose_name='Prénom')),
                 ('courriel', models.EmailField(max_length=254)),
-                ('scrutin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Formulaire')),
+                ('scrutin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Scrutin')),
             ],
         ),
     ]

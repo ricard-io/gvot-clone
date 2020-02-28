@@ -43,7 +43,7 @@ class SitePage(Page):
     # ------------------------
 
     parent_page_types = ['SitePage', Page]
-    subpage_types = ['SitePage', 'FormulaireIndex']
+    subpage_types = ['SitePage', 'ScrutinIndex']
 
     # Contenu
     # -------
@@ -62,18 +62,18 @@ class SitePage(Page):
     ]
 
 
-class FormulaireIndex(Page):
+class ScrutinIndex(Page):
     """
-    Elle sert à lister les formulaires. Elle n'a a priori aucun intérêt à
+    Elle sert à lister les scrutins. Elle n'a a priori aucun intérêt à
     apparaître au public.
     """
 
     class Meta:
-        verbose_name = "liste des formulaires"
-        verbose_name_plural = "listes des formulaires"
+        verbose_name = "liste des scrutins"
+        verbose_name_plural = "listes des scrutins"
 
     parent_page_types = ['SitePage', Page]
-    subpage_types = ['Formulaire']
+    subpage_types = ['Scrutin']
 
     @classmethod
     def can_create_at(cls, parent):
@@ -98,7 +98,7 @@ class FormField(AbstractFormField):
     """
 
     page = ParentalKey(
-        'Formulaire', on_delete=models.CASCADE, related_name='form_fields'
+        'Scrutin', on_delete=models.CASCADE, related_name='form_fields'
     )
     field_type = models.CharField(
         verbose_name='field type', max_length=16, choices=FORM_FIELD_CHOICES,
@@ -112,16 +112,15 @@ class Vote(AbstractFormSubmission):
 # TODO: email d'annonce
 # TODO: email de rappel
 # TODO: email de confirmation
-# FIXME: s/Formulaire/Scrutin
 # FIXME: considérer scrutin ouvert ou pas
 # (si pas: pas de post et formulare desactivé).
-class Formulaire(RoutablePageMixin, AbstractEmailForm):
+class Scrutin(RoutablePageMixin, AbstractEmailForm):
     """
-    Elle sert à publier un formulaire pour une inscription à un évènement,
+    Elle sert à publier un scrutin pour une inscription à un évènement,
     une newsletter, etc. ou n'importe quelle récolte de données simples.
     """
 
-    parent_page_types = ['FormulaireIndex']
+    parent_page_types = ['ScrutinIndex']
     subpage_types = []
 
     peremption = models.DateField(
@@ -185,7 +184,7 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
 
     @route(r'^$')
     def no_way(self, request, *args, **kwargs):
-        "Sauf en preview, le formulaire n'est pas accessible sans uuid valable"
+        "Sauf en preview, le scrutin n'est pas accessible sans uuid valable"
         if request.is_preview:
             return super().serve(request, *args, **kwargs)
         raise Http404
@@ -248,7 +247,7 @@ class Pouvoir(models.Model):
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
-    scrutin = models.ForeignKey('Formulaire', on_delete=models.CASCADE)
+    scrutin = models.ForeignKey('Scrutin', on_delete=models.CASCADE)
     nom = models.CharField(max_length=100)
     prenom = models.CharField('Prénom', max_length=100)
     courriel = models.EmailField()

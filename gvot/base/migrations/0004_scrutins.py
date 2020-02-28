@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Formulaire',
+            name='Scrutin',
             fields=[
                 ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
                 ('to_address', models.CharField(blank=True, help_text='Optional - form submissions will be emailed to these addresses. Separate multiple addresses by comma.', max_length=255, verbose_name='to address')),
@@ -50,19 +50,19 @@ class Migration(migrations.Migration):
             bases=('wagtailcore.page',),
         ),
         migrations.CreateModel(
-            name='FormulaireIndex',
+            name='ScrutinIndex',
             fields=[
                 ('page_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
             ],
             options={
-                'verbose_name': 'liste des formulaires',
-                'verbose_name_plural': 'listes des formulaires',
+                'verbose_name': 'liste des scrutins',
+                'verbose_name_plural': 'listes des scrutins',
             },
             bases=('wagtailcore.page',),
         ),
         migrations.AddField(
             model_name='formfield',
             name='page',
-            field=modelcluster.fields.ParentalKey(on_delete=django.db.models.deletion.CASCADE, related_name='form_fields', to='base.Formulaire'),
+            field=modelcluster.fields.ParentalKey(on_delete=django.db.models.deletion.CASCADE, related_name='form_fields', to='base.Scrutin'),
         ),
     ]

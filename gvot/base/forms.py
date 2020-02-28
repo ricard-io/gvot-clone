@@ -3,7 +3,7 @@ import csv
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Formulaire as Scrutin
+from .models import Scrutin as Scrutin
 
 
 class ImportForm(forms.Form):
