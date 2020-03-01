@@ -1,0 +1,158 @@
+{% extends "modeladmin/create.html" %}
+{% load static accessors modeladmin_tags %}
+
+{% block titletag %}Importer des pouvoirs (2/2){% endblock %}
+
+{% block content %}
+  {% include "wagtailadmin/shared/header.html" with title="Importer des pouvoirs" icon="download" subtitle=" Analyse de l'import avant validation" %}
+
+<div class="nice-padding">
+  <div class="overflow">
+
+    {% if import_ko %}
+      <div class="help-block help-critical">
+        <h2>Ligne{{ import_ko | pluralize }} nécessitant correction{{ import_ko | pluralize }}</h2>
+      </div>
+      <table class="listing">
+        <thead>
+          <tr>
+            {% for field in import_fields %}
+              {% if forloop.first %}
+                <th id="{{ field }}" class="ordered ascending">
+                  {{ field | title }}
+                </th>
+              {% else %}
+                <th id="{{ field }}">
+                  {{ model | verbose_fieldname:field | title }}
+                </th>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for index, pouvoir, exception in import_ko %}
+            <tr>
+              {% for field in import_fields %}
+                <td>
+                  {% if forloop.first %}
+                    {{ index | add:2 }}
+                  {% else %}
+                    {{ pouvoir | getattr:field | truncatechars:100 }}
+                    {% for error in exception.error_dict|get:field %}
+                      {% for message in error.messages %}
+                        <p class="error-message">
+                          {{ message }}
+                        </p>
+                      {% endfor %}
+                    {% endfor %}
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    {% if import_warn %}
+      <div class="help-block help-warning">
+        <h2>Ligne{{ import_warn | pluralize }} nécessitant attention</h2>
+      </div>
+      <table class="listing">
+        <thead>
+          <tr>
+            {% for field in import_fields %}
+              {% if forloop.first %}
+                <th id="{{ field }}" class="ordered ascending">
+                  {{ field | title }}
+                </th>
+                <th id="warnings">
+                  Avertissements
+                </th>
+              {% else %}
+                <th id="{{ field }}">
+                  {{ model | verbose_fieldname:field | title }}
+                </th>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for index, pouvoir, warning in import_warn %}
+            <tr>
+              {% for field in import_fields %}
+                <td>
+                  {% if forloop.first %}
+                    {{ index | add:2 }}
+                </td>
+                <td>
+                      <p class="error-message">
+                        {{ warning }}
+                      </p>
+                  {% else %}
+                    {{ pouvoir | getattr:field | truncatechars:100 }}
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    {% if import_ok %}
+      <div class="help-block help-info">
+        <h2>Ligne{{ import_ok | pluralize }} importable{{ import_ok | pluralize }}</h2>
+      </div>
+      <table class="listing">
+        <thead>
+          <tr>
+            {% for field in import_fields %}
+              {% if forloop.first %}
+                <th id="{{ field }}" class="ordered ascending">
+                  {{ field | title }}
+                </th>
+              {% else %}
+                <th id="{{ field }}">
+                  {{ model | verbose_fieldname:field | title }}
+                </th>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for index, pouvoir, _ in import_ok %}
+            <tr>
+              {% for field in import_fields %}
+                <td>
+                  {% if forloop.first %}
+                    {{ index | add:2 }}
+                  {% else %}
+                    {{ pouvoir | getattr:field }}
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</div>
+
+<form action="" method="POST" novalidate>
+  {% csrf_token %}
+  {{ form }}
+  <footer role="contentinfo">
+    <ul>
+      <li class="actions">
+        <div class="dropdown dropup dropdown-button match-width">
+          <button type="submit" class="button action-save button-longrunning{% if import_ko %} disabled{% endif %}" data-clicked-text="Effectuer l'importation">
+            <span class="icon icon-spinner"></span><em>{% if import_ko %}Impossible d'{% endif %}Effectuer l'import</em>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </footer>
+</form>
+{% endblock %}

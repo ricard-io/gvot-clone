@@ -1,0 +1,21 @@
+from django import template
+
+register = template.Library()
+
+
+@register.filter
+def verbose_fieldname(model, field):
+    """Raccourcis pour les titres des champs"""
+    return model._meta.get_field(field).verbose_name
+
+
+@register.filter(name="getattr")
+def _getattr(obj, key):
+    """Equivalent d'un getattr dans les templates."""
+    return getattr(obj, key)
+
+
+@register.filter(name="get")
+def _get(obj, key):
+    """Equivalent d'un get dans les templates."""
+    return obj.get(key, "")

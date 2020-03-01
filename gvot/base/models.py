@@ -109,8 +109,12 @@ class Vote(AbstractFormSubmission):
     pouvoir = models.ForeignKey('Pouvoir', on_delete=models.CASCADE)
 
 
+# TODO: email d'annonce
+# TODO: email de rappel
+# TODO: email de confirmation
 # FIXME: s/Formulaire/Scrutin
-# FIXME: considérer scrutin ouvert ou pas (si pas: pas de post et formulare desactivé).
+# FIXME: considérer scrutin ouvert ou pas
+# (si pas: pas de post et formulare desactivé).
 class Formulaire(RoutablePageMixin, AbstractEmailForm):
     """
     Elle sert à publier un formulaire pour une inscription à un évènement,
@@ -185,7 +189,6 @@ class Formulaire(RoutablePageMixin, AbstractEmailForm):
         if request.is_preview:
             return super().serve(request, *args, **kwargs)
         raise Http404
-
 
     @route(r'(?P<uuid>' + UUIDConverter.regex + ')')
     def uuid_way(self, request, uuid, *args, **kwargs):

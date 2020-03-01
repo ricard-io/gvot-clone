@@ -1,0 +1,63 @@
+{% extends "modeladmin/create.html" %}
+{% load static %}
+
+{% block titletag %}Importer des pouvoirs (1/2){% endblock %}
+
+{% block header %}
+  {% include "wagtailadmin/shared/header.html" with title="Importer des pouvoirs" icon="download" subtitle=" Une page de confirmation vous sera soumise avant l'importation effective des données." %}
+{% endblock %}
+
+{% block form_action %}{% endblock %}
+
+{% block form %}
+  <ul class="objects">
+    <li class="object required model_choice_field">
+      <div class="title-wrapper">
+        <label for="id_scrutin">
+          Scrutin
+        </label>
+      </div>
+      <div class="object-layout">
+        <div class="object-layout_big-part">
+          <fieldset>
+            {% include "wagtailadmin/shared/field_as_li.html" with field=form.scrutin show_label=False  %}
+          </fieldset>
+        </div>
+      </div>
+    </li>
+    <li class="object boolean_field">
+      <div class="object-layout">
+        <div class="object-layout_big-part">
+          <fieldset>
+            {% include "wagtailadmin/shared/field_as_li.html" with field=form.remplace show_label=True  %}
+          </fieldset>
+        </div>
+      </div>
+    </li>
+    <li class="object required file_field">
+      <div class="title-wrapper">
+        <label for="id_scrutin">
+          Fichier CSV
+        </label>
+      </div>
+      <div class="object-layout">
+        <div class="object-layout_big-part">
+          <fieldset>
+            {% include "wagtailadmin/shared/field_as_li.html" with field=form.csv_file show_label=False  %}
+            <p>
+              Un exemple d'un tel fichier est <a href="{% static '/files/exemple_import_pouvoir.csv' %}">fourni ici</a>.
+            </p>
+          </fieldset>
+        </div>
+      </div>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block form_actions %}
+  <div class="dropdown dropup dropdown-button match-width">
+    <button type="submit" class="button action-save button-longrunning" data-clicked-text="Poursuivre">
+      <span class="icon icon-spinner"></span><em>Poursuivre</em>
+    </button>
+  </div>
+{% endblock %}
