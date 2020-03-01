@@ -24,7 +24,7 @@ from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Page
 from wagtail.search import index
 
-from . import blocks, mixins
+from . import blocks
 
 
 class SitePage(Page):
@@ -59,7 +59,7 @@ class SitePage(Page):
     ]
 
 
-class FormulaireIndex(mixins.UniqPage, Page):
+class FormulaireIndex(Page):
     """
     Elle sert à lister les formulaires. Elle n'a a priori aucun intérêt à
     apparaître au public.
@@ -71,6 +71,11 @@ class FormulaireIndex(mixins.UniqPage, Page):
 
     parent_page_types = ['SitePage', Page]
     subpage_types = ['Formulaire']
+
+    @classmethod
+    def can_create_at(cls, parent):
+        # Seulement une instance possible
+        return not cls.objects.exists() and super().can_create_at(parent)
 
     def serve(self, request):
         raise Http404
