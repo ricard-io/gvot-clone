@@ -115,6 +115,8 @@ class Vote(AbstractFormSubmission):
 # TODO: email de rappel
 # TODO: email de confirmation
 # TODO: afficher ouverture du scrutin dans la liste des scrutins
+# TODO: une fois le scrutin ouvert et les votes enregistrés, fermer le
+#       scrutin ne permet plus même de tester.
 class Scrutin(RoutablePageMixin, AbstractEmailForm):
     """
     Elle sert à publier un scrutin pour une inscription à un évènement,
@@ -127,7 +129,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     ouvert = models.BooleanField(
         "Scrutin ouvert",
         default=False,
-        blank = True,
+        blank=True,
         help_text="Tant que le scrutin n'est pas ouvert, il est fonctionnel "
         "pour les tests mais les votes ne sont pas enregistrés.",
     )
