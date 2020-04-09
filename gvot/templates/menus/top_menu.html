@@ -1,5 +1,5 @@
 {% load menu_tags static %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
   <div class="container">
     <a class="navbar-brand" href="#">
       <img src="{% static '/img/logo.png' %}" style="margin: -2ex 0;" width="auto" height="64" alt="Logo GvoT">
@@ -10,9 +10,6 @@
 
     <div class="collapse navbar-collapse" id="top_menu">
       {% main_menu %}
-      <form class="form-inline my-2 my-md-0">
-        <input class="form-control" type="text" placeholder="Rechercher" aria-label="Rechercher">
-      </form>
     </div>
   </div>
 </nav>

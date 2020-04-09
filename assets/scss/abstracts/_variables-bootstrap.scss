@@ -22,3 +22,18 @@ $cyan: #17a2b8;
 $theme-colors: (
   "error": $red
 );
+
+/* Cliss XXXI colors */
+
+$gvot-bleu: #2659ff !default;
+$gvot-orange: #ff820a !default;
+
+// theme main colors
+$primary: $gvot-bleu !default;
+$secondary: $gvot-orange !default;
+
+// theme colors
+$theme-colors: (
+  "primary":     $primary,
+  "secondary":   $secondary,
+);
