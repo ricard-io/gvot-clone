@@ -1,6 +1,6 @@
-# GvoT
+# ![GvoT](assets/img/logo.png)
 
-Logiciel de votation
+GvoT est un logiciel libre pour organiser des votations à large échelle.
 
 **Table of content**
 
@@ -12,7 +12,7 @@ Logiciel de votation
 
 ## Give a try
 
-On a Debian-based host - running at least Debian Stretch:
+On a Debian-based host - running at least Debian Buster:
 
 ```
 $ sudo apt install python3 virtualenv git make
