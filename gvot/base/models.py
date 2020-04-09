@@ -13,7 +13,9 @@ from wagtail.admin.edit_handlers import (
     FieldRowPanel,
     InlinePanel,
     MultiFieldPanel,
+    ObjectList,
     StreamFieldPanel,
+    TabbedInterface,
 )
 from wagtail.contrib.forms.edit_handlers import FormSubmissionsPanel
 from wagtail.contrib.forms.models import (
@@ -154,7 +156,6 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
     confirmation = RichTextField(blank=True)
 
-    # FIXME: mettre les questions dans un panel séparé
     content_panels = AbstractEmailForm.content_panels + [
         FormSubmissionsPanel(),
         MultiFieldPanel(
@@ -165,7 +166,6 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             ], "Aspects RGPD",
         ),
         FieldPanel('introduction'),
-        InlinePanel('form_fields', label="Champs de formulaire"),
         FieldPanel('confirmation'),
         MultiFieldPanel(
             [
@@ -185,6 +185,24 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             "Envoi des résultats",
         ),
     ]
+
+    form_panels = [
+        InlinePanel('form_fields', label="Champs de formulaire"),
+    ]
+
+    promote_panels = Page.promote_panels
+    settings_panels = Page.settings_panels
+
+    edit_handler = TabbedInterface(
+        [
+            ObjectList(content_panels, heading="Détails du scrutin"),
+            ObjectList(form_panels, heading="Questionnaire"),
+            ObjectList(promote_panels, heading="Promotion"),
+            ObjectList(
+                settings_panels, heading="Paramètres", classname='settings'
+            ),
+        ]
+    )
 
     search_fields = Page.search_fields + [
         index.SearchField('introduction'),
