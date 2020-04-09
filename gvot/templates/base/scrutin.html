@@ -3,6 +3,9 @@
 
 {% block content %}
   <h1>{{ page.title }}</h1>
+  {% if not page.ouvert %}
+  <div class="alert alert-info"><i class="fa fa-warning mr-2"></i>Ce scrutin est fermé. Il est accessible à titre de test mais votre vote ne sera pas comptabilisé.</div>
+  {% endif %}
 
   {% block inner_content %}
     <div class="py-2 py-md-5 lead">

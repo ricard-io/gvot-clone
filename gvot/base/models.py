@@ -112,8 +112,7 @@ class Vote(AbstractFormSubmission):
 # TODO: email d'annonce
 # TODO: email de rappel
 # TODO: email de confirmation
-# FIXME: considérer scrutin ouvert ou pas
-# (si pas: pas de post et formulare desactivé).
+# TODO: afficher ouverture du scrutin dans la liste des scrutins
 class Scrutin(RoutablePageMixin, AbstractEmailForm):
     """
     Elle sert à publier un scrutin pour une inscription à un évènement,
@@ -122,6 +121,14 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
     parent_page_types = ['ScrutinIndex']
     subpage_types = []
+
+    ouvert = models.BooleanField(
+        "Scrutin ouvert",
+        default=False,
+        blank = True,
+        help_text="Tant que le scrutin n'est pas ouvert, il est fonctionnel "
+        "pour les tests mais les votes ne sont pas enregistrés.",
+    )
 
     peremption = models.DateField(
         "Date de péremption",
@@ -152,6 +159,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         FormSubmissionsPanel(),
         MultiFieldPanel(
             [
+                FieldPanel('ouvert'),
                 FieldPanel('peremption'),
                 FieldPanel('prescription'),
             ], "Aspects RGPD",
@@ -229,15 +237,16 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         return form_class(*args, **kwargs)
 
     def process_form_submission(self, form, pouvoir):
-        self.get_submission_class().objects.update_or_create(
-            pouvoir=pouvoir,
-            page=self,
-            defaults={
-                'form_data': json.dumps(
-                    form.cleaned_data, cls=DjangoJSONEncoder
-                ),
-            },
-        )
+        if self.ouvert:
+            self.get_submission_class().objects.update_or_create(
+                pouvoir=pouvoir,
+                page=self,
+                defaults={
+                    'form_data': json.dumps(
+                        form.cleaned_data, cls=DjangoJSONEncoder
+                    ),
+                },
+            )
 
     def get_submission_class(self):
         return Vote
