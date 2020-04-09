@@ -14,6 +14,29 @@
 {% endblock %}
 
 {% block postcontainer %}
+  <footer class="container app-footer">
   {% include 'menus/footer_menu.html' %}
+    <div class="row no-gutters align-items-center bg-light">
+      <div class="col-md order-md-1">
+        <ul class="nav justify-content-center justify-content-md-end footer-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="https://forge.cliss21.org/cliss21/gvot">
+              Code source
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/docs/">
+              Documentation
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-auto order-md-0 mt-1 mt-md-0 text-center">
+        <p class="footer-meta mb-0">
+          <a href="/">GvoT</a> &mdash; développé par <a href="https://www.cliss21.com">Cliss XXI</a> sous licence <a href="https://www.gnu.org/licenses/agpl-3.0.txt">AGPLv3+</a>
+        </p>
+      </div>
+    </div>
+  </footer>
 {% endblock %}
 
