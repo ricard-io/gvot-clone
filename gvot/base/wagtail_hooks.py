@@ -1,6 +1,7 @@
 from django.urls import include, path, reverse
 from django.utils.html import format_html
 
+from wagtail.contrib.forms.wagtail_hooks import FormsMenuItem
 from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.options import ModelAdmin, modeladmin_register
 from wagtail.core import hooks
@@ -47,3 +48,16 @@ def register_admin_urls():
     return [
         path('import-pouvoir/', include(admin_urls, namespace='import')),
     ]
+
+
+@hooks.register('register_admin_menu_item')
+def register_forms_menu_item():
+    return FormsMenuItem(
+        'Scrutins', reverse('wagtailforms:index'),
+        name='scrutins', classnames='icon icon-form', order=700
+    )
+
+
+@hooks.register('construct_main_menu')
+def hide_forms_menu_item(request, menu_items):
+    menu_items[:] = [item for item in menu_items if item.name != 'forms']
