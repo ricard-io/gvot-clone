@@ -31,12 +31,21 @@ class ImportButtonHelper(ButtonHelper):
         }
 
 
+# FIXME: cache l'uuid à terme ?
 @modeladmin_register
 class PouvoirAdmin(ModelAdmin):
     model = Pouvoir
     menu_icon = 'group'
     menu_label = "Pouvoirs"
-    list_display = ('uuid', 'prenom', 'nom', 'courriel', 'scrutin')
+    list_display = (
+        'uuid',
+        'prenom',
+        'nom',
+        'courriel',
+        'scrutin',
+        'contact',
+        'ponderation',
+    )
     list_filter = ('scrutin',)
     search_fields = ('prenom', 'nom', 'courriel')
     index_template_name = 'modeladmin/index_pouvoirs.html'

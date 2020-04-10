@@ -54,7 +54,7 @@ class ImportConfirm(FormView):
     template_name = 'import/confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
 
-    champs = ['nom', 'prenom', 'courriel']
+    champs = ['nom', 'prenom', 'courriel', 'contact', 'ponderation']
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -103,6 +103,9 @@ class ImportConfirm(FormView):
             }
             for r in reader
         ]
+
+        # Par défaut on force les ponderation vides à 1
+        [d.update({"ponderation": d["ponderation"] or 1}) for d in datas]
 
         return (models.Pouvoir(scrutin_id=self.scrutin, **d) for d in datas)
 

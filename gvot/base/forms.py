@@ -2,6 +2,7 @@ import csv
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
 
 from .models import Scrutin as Scrutin
 
@@ -27,10 +28,14 @@ class ImportForm(forms.Form):
     )
 
     csv_file = forms.FileField(
-        help_text=(
-            """Fichier au format csv dans un codage utf-8 ; """
-            """séparateur : « , » ; délimiteur de texte : « " ». """
-            """Colonnes attendues : « nom », « prenom », « courriel »."""
+        help_text=mark_safe(
+            "Fichier au format csv dans un codage utf-8 ; "
+            "séparateur : « , » ; délimiteur de texte : « \" » (doubles "
+            "quotes).<br>Colonnes attendues : « nom{star} », « prenom{star}"
+            " », « courriel{star} », « contact » et « ponderation ».<br>"
+            "Les colonnes marquée par « {star} » ne peuvent être vides.<br>"
+            "Une pondération absente sera interprétée à la valeur « 1 »."
+            .format(star='<span style="color:#cd3238">*</span>')
         ),
     )
 

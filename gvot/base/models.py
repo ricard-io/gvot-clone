@@ -280,14 +280,25 @@ class Pouvoir(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField('Prénom', max_length=100)
     courriel = models.EmailField()
+    contact = models.CharField(
+        "Contact alternatif en cas de courriel en erreur",
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    ponderation = models.PositiveSmallIntegerField(
+        "Pondération", default=1,
+    )
 
     panels = [
         FieldPanel('scrutin'),
+        FieldPanel('ponderation'),
         MultiFieldPanel(
             [FieldRowPanel([FieldPanel('nom'), FieldPanel('prenom')])],
             "Identité",
         ),
         FieldPanel('courriel'),
+        FieldPanel('contact'),
     ]
 
     def __str__(self):
