@@ -3,8 +3,12 @@
 
 {% block content %}
   <h1>{{ page.title }}</h1>
-  {% if not page.ouvert %}
-  <div class="alert alert-info"><i class="fa fa-warning mr-2"></i>Ce scrutin est fermé. Il est accessible à titre de test mais votre vote ne sera pas comptabilisé.</div>
+  {% if not page.ouvert and not page.vote_set.exists %}
+    <div class="alert alert-info"><i class="fa fa-warning mr-2"></i>Ce scrutin n'est pas encore ouvert. Il est accessible à titre de test mais votre vote ne sera pas comptabilisé.</div>
+  {% elif not page.ouvert and page.vote_set.exists %}
+    <div class="alert alert-danger"><i class="fa fa-warning mr-2"></i>Ce scrutin est désormais fermé. Veuillez vous rapprochez des organisateurs en cas de problème.</div>
+  {% elif page.ouvert and deja_vote %}
+    <div class="alert alert-info"><i class="fa fa-lightbulb-o mr-2"></i>Il semble que vous ayez déjà voté. Vous pouvez contrôler votre vote et le corriger jusque la fermeture du scrutin.</div>
   {% endif %}
 
   {% block inner_content %}
@@ -12,20 +16,22 @@
       {{ page.introduction|richtext }}
     </div>
 
-    <article>
-      <form class="p-3" action="" method="post">
-        {% csrf_token %}
-        <div class="invalid-feedback">
-          {{ form.non_field_errors }}
-        </div>
-        {% for field in form %}
-          {% include "./includes/formfield.html" with label_class="h3" collapse=False %}
-        {% endfor %}
-        <div>
-          <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
-        </div>
-      </form>
-    </article>
+    {% if page.ouvert or not page.vote_set.exists %}
+      <article>
+        <form class="p-3" action="" method="post">
+          {% csrf_token %}
+          <div class="invalid-feedback">
+            {{ form.non_field_errors }}
+          </div>
+          {% for field in form %}
+            {% include "./includes/formfield.html" with label_class="h3" collapse=False %}
+          {% endfor %}
+          <div>
+            <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
+          </div>
+        </form>
+      </article>
+    {% endif %}
   {% endblock %}
 
   <div class="py-2 px-3">

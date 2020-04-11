@@ -3,7 +3,7 @@ import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.http import Http404
+from django.http import Http404, HttpResponseGone
 from django.shortcuts import get_object_or_404, render
 from django.urls.converters import UUIDConverter
 from django.utils import timezone
@@ -112,12 +112,14 @@ class Vote(AbstractFormSubmission):
     pouvoir = models.ForeignKey('Pouvoir', on_delete=models.CASCADE)
 
 
+class ClosedScrutin(Exception):
+    pass
+
+
 # TODO: email d'annonce
 # TODO: email de rappel
 # TODO: email de confirmation
 # TODO: afficher ouverture du scrutin dans la liste des scrutins
-# TODO: une fois le scrutin ouvert et les votes enregistrés, fermer le
-#       scrutin ne permet plus même de tester.
 class Scrutin(RoutablePageMixin, AbstractEmailForm):
     """
     Elle sert à publier un scrutin pour une inscription à un évènement,
@@ -233,23 +235,29 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             )
 
             if form.is_valid():
-                submission = self.process_form_submission(form, pouvoir)
-                return self.render_landing_page(
-                    request, submission, *args, **kwargs
-                )
+                try:
+                    submission = self.process_form_submission(form, pouvoir)
+                    return self.render_landing_page(
+                        request, submission, *args, **kwargs
+                    )
+                except ClosedScrutin:
+                    return HttpResponseGone("Ce scrutin est fermé.")
         else:
             form = self.get_form(pouvoir=pouvoir)
 
         context = self.get_context(request)
         context['form'] = form
-        return render(request, self.get_template(request), context,)
+        context['deja_vote'] = self.get_submission_class().objects.filter(
+            pouvoir=pouvoir, page=self
+        ).exists()
+        return render(request, self.get_template(request), context)
 
     def get_form(self, *args, **kwargs):
         form_class = self.get_form_class()
         pouvoir = kwargs.pop('pouvoir', None)
         vote = (
             self.get_submission_class()
-            .objects.filter(pouvoir=pouvoir, page=self,)
+            .objects.filter(pouvoir=pouvoir, page=self)
             .first()
         )
         if vote:
@@ -283,6 +291,14 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             else:
                 # Mise à jour
                 votes.update(form_data=form_data, submit_time=timezone.now())
+        elif not self.vote_set.exists():
+            # Personne n'a oncore voté ; donc on est en test
+            pass
+        else:
+            # Quelqu'un rejoue un POST alors que l'interface ne le propose pas
+            raise ClosedScrutin
+
+        # TODO: notification au participant
 
     def get_submission_class(self):
         return Vote
