@@ -6,6 +6,7 @@ from django.db import models
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls.converters import UUIDConverter
+from django.utils import timezone
 
 from modelcluster.fields import ParentalKey
 from wagtail.admin.edit_handlers import (
@@ -257,16 +258,31 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         return form_class(*args, **kwargs)
 
     def process_form_submission(self, form, pouvoir):
+        # FIXME: documentation :
+        # compte tenu que les types des questions/réponses ne sont pas
+        # nécessairement multipliables, la seule façon de les comptabiliser
+        # consiste à les dupliquer. Ce faisant la création ou la mise à jour
+        # des soumissions est chamboulée.
+        # FIXME: documentation et/ou à fixer
+        # Il n'y a pas de verrouillage de la pondération au cours du vote.
+        # Si ça devait bouger (ce qui serait tout de même une extraordinaire
+        # mauvaise idée) on considère seule légitime la valeur initiale
+        # s'il s'agit d'une MaJ du vote.
         if self.ouvert:
-            self.get_submission_class().objects.update_or_create(
-                pouvoir=pouvoir,
-                page=self,
-                defaults={
-                    'form_data': json.dumps(
-                        form.cleaned_data, cls=DjangoJSONEncoder
-                    ),
-                },
-            )
+            form_data = json.dumps(form.cleaned_data, cls=DjangoJSONEncoder)
+            votes = self.get_submission_class().objects.filter(pouvoir=pouvoir)
+            if not votes:
+                # Création
+                votes.bulk_create(
+                    pouvoir.ponderation * [
+                        votes.model(
+                            pouvoir=pouvoir, page=self, form_data=form_data
+                        )
+                    ]
+                )
+            else:
+                # Mise à jour
+                votes.update(form_data=form_data, submit_time=timezone.now())
 
     def get_submission_class(self):
         return Vote
