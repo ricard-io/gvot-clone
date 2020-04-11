@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <title>
+    Confirmation de votre participation au scrutin « {{ pouvoir.scrutin.title }} »
+  </title>
+</head>
+<body>
+<p>
+  Bonjour {{ pouvoir.prenom }} {{ pouvoir.nom }},
+</p>
+<p>
+  Nous avons bien enregistré votre vote pour le scrutin
+  « {{ pouvoir.scrutin.title }} ».
+</p>
+<p>
+  Vous pouvez à tout moment jusque la fin du scrutin retrouver votre contribution
+  et éventuellement la corriger à cette adresse :<br>
+  <a rel="noreferrer"href="{{ request.scheme }}://{{ request.get_host }}{{ pouvoir.scrutin.url_path }}{{ pouvoir.uuid }}">
+    {{ request.scheme }}://{{ request.get_host }}{{ pouvoir.scrutin.url_path }}{{ pouvoir.uuid }}
+  </a>
+</p>
+<p>
+Merci pour votre participation.
+</p>
+<hr>
+<p>
+  Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.<br>
+  Pour plus d'informations :
+  <a rel="noreferrer"href="{{ request.scheme }}://{{ request.get_host }}">
+    {{ request.scheme }}://{{ request.get_host }}
+  </a>
+</p>
+<p>
+  En cas de difficultés : <a href="mailto:{{ settings.assistance }}">contactez l'assistance</a>.
+</p>
+</body>
+</html>

@@ -1,3 +1,5 @@
+from . import env
+
 """
 Django specific settings for GvoT project.
 """
@@ -15,3 +17,5 @@ WAGTAILEMBEDS_FINDERS = [
     {'class': 'wagtail.embeds.finders.oembed'},
     {'class': 'wagtailembedpeertube.finders'},
 ]
+
+ASSISTANCE = env('ASSISTANCE', default='assistance@localhost')

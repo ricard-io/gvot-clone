@@ -30,7 +30,7 @@ from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Page
 from wagtail.search import index
 
-from . import blocks
+from . import blocks, emails
 
 
 class SitePage(Page):
@@ -118,7 +118,6 @@ class ClosedScrutin(Exception):
 
 # TODO: email d'annonce
 # TODO: email de rappel
-# TODO: email de confirmation
 # TODO: afficher ouverture du scrutin dans la liste des scrutins
 class Scrutin(RoutablePageMixin, AbstractEmailForm):
     """
@@ -220,6 +219,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             return super().serve(request, *args, **kwargs)
         raise Http404
 
+    # FIXME: c'est contreproductif de mettre l'uuid sous le path
     @route(r'(?P<uuid>' + UUIDConverter.regex + ')')
     def uuid_way(self, request, uuid, *args, **kwargs):
         pouvoir = get_object_or_404(Pouvoir, uuid=uuid)
@@ -236,7 +236,9 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
             if form.is_valid():
                 try:
-                    submission = self.process_form_submission(form, pouvoir)
+                    submission = self.process_form_submission(
+                        request, form, pouvoir
+                    )
                     return self.render_landing_page(
                         request, submission, *args, **kwargs
                     )
@@ -265,7 +267,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             return form_class(*args, initial=initial, **kwargs)
         return form_class(*args, **kwargs)
 
-    def process_form_submission(self, form, pouvoir):
+    def process_form_submission(self, request, form, pouvoir):
         # FIXME: documentation :
         # compte tenu que les types des questions/réponses ne sont pas
         # nécessairement multipliables, la seule façon de les comptabiliser
@@ -291,6 +293,8 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             else:
                 # Mise à jour
                 votes.update(form_data=form_data, submit_time=timezone.now())
+            pouvoir.notify_vote(request)
+
         elif not self.vote_set.exists():
             # Personne n'a oncore voté ; donc on est en test
             pass
@@ -298,13 +302,13 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             # Quelqu'un rejoue un POST alors que l'interface ne le propose pas
             raise ClosedScrutin
 
-        # TODO: notification au participant
-
     def get_submission_class(self):
         return Vote
 
 
 class Pouvoir(models.Model):
+    # FIXME: le pouvoir devrait fournir lui même son url d'accès
+    # pour limiter le contexte accessible via le backend
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
@@ -335,3 +339,9 @@ class Pouvoir(models.Model):
 
     def __str__(self):
         return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
+
+    def notify_vote(self, request):
+        context = {'pouvoir': self}
+        emails.send_templated(
+            request, 'notify_vote', context, None, [self.courriel]
+        )
