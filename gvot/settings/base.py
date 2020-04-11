@@ -232,7 +232,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/stable/ref/settings/#admins
 ADMINS = getaddresses(
-    [env('ADMINS', default='Cliss XXI <francois.poulain@cliss21.org>')]
+    [env('ADMINS', default='Cliss XXI <tech@cliss21.org>')]
 )
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#managers

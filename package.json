@@ -2,7 +2,7 @@
   "name": "gvot",
   "version": "0.1.0",
   "description": "Logiciel de votation",
-  "author": "Cliss XXI <francois.poulain@cliss21.org>",
+  "author": "Cliss XXI <tech@cliss21.org>",
   "license": "AGPL-3.0+",
   "scripts": {
     "build": "gulp build",
