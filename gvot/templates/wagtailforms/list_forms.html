@@ -13,7 +13,7 @@
   </thead>
   <tbody>
     {% for fp in form_pages reversed %}
-      {% with fp.formsubmission_set.all as submissions %}
+      {% with fp.vote_set.all as submissions %}
         {% with submissions.last.submit_time as last_submit_time %}
         <tr>
           <td class="title">
