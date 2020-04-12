@@ -16,8 +16,8 @@
 <p>
   Vous pouvez à tout moment jusque la fin du scrutin retrouver votre contribution
   et éventuellement la corriger à cette adresse :<br>
-  <a rel="noreferrer" href="{{ request.scheme }}://{{ request.get_host }}{{ pouvoir.uri }}">
-    {{ request.scheme }}://{{ request.get_host }}{{ pouvoir.uri }}
+  <a rel="noreferrer" href="{{ request.base_url }}{{ pouvoir.uri }}">
+    {{ request.base_url }}{{ pouvoir.uri }}
   </a>
 </p>
 <p>
@@ -27,8 +27,8 @@ Merci pour votre participation.
 <p>
   Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.<br>
   Pour plus d'informations :
-  <a rel="noreferrer" href="{{ request.scheme }}://{{ request.get_host }}">
-    {{ request.scheme }}://{{ request.get_host }}
+  <a rel="noreferrer" href="{{ request.base_url }}">
+    {{ request.base_url }}
   </a>
 </p>
 <p>

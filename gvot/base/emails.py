@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 def send_templated(request, base_tpl, context, sender, recipients, **kwargs):
     def render_subject():
         template = "emails/{}.subject".format(base_tpl)
-        subject = render_to_string(template, context, request=request)
+        subject = render_to_string(template, context)
         # Email subject *must not* contain newlines
         return ''.join(subject.splitlines())
 
@@ -17,11 +17,14 @@ def send_templated(request, base_tpl, context, sender, recipients, **kwargs):
             template = "emails/{}.txt".format(base_tpl)
         else:
             template = "emails/{}.html".format(base_tpl)
-        return render_to_string(template, context, request=request)
+        return render_to_string(template, context)
 
     context.update({
         'site': get_current_site(request),
         'settings': {'assistance': settings.ASSISTANCE},
+        'request': {
+            'base_url': "{}://{}".format(request.scheme, request.get_host()),
+        },
     })
 
     subject = render_subject()

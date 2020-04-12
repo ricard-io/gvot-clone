@@ -6,14 +6,14 @@ Nous avons bien enregistré votre vote pour le scrutin
 
 Vous pouvez à tout moment jusque la fin du scrutin retrouver votre contribution
 et éventuellement la corriger à cette adresse :
-{{ request.scheme }}://{{ request.get_host }}{{ pouvoir.uri }}
+{{ request.base_url }}{{ pouvoir.uri }}
 
 Merci pour votre participation.
 L'équipe organisatrice
 ---
 
 Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.
-Pour plus d'informations : {{ request.scheme }}://{{ request.get_host }}
+Pour plus d'informations : {{ request.base_url }}
 
 En cas de difficultés : {{ settings.assistance }}
 
