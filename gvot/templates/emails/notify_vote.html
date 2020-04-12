@@ -16,8 +16,8 @@
 <p>
   Vous pouvez à tout moment jusque la fin du scrutin retrouver votre contribution
   et éventuellement la corriger à cette adresse :<br>
-  <a rel="noreferrer" href="{{ request.scheme }}://{{ request.get_host }}{% url 'uuid' pouvoir.uuid %}">
-    {{ request.scheme }}://{{ request.get_host }}{% url 'uuid' pouvoir.uuid %}
+  <a rel="noreferrer" href="{{ request.scheme }}://{{ request.get_host }}{{ pouvoir.uri }}">
+    {{ request.scheme }}://{{ request.get_host }}{{ pouvoir.uri }}
   </a>
 </p>
 <p>

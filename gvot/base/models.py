@@ -5,6 +5,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import Http404, HttpResponseGone
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.urls.converters import UUIDConverter
 from django.utils import timezone
 
@@ -306,8 +307,6 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
 
 class Pouvoir(models.Model):
-    # FIXME: le pouvoir devrait fournir lui même son url d'accès
-    # pour limiter le contexte accessible via le backend
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
@@ -344,3 +343,6 @@ class Pouvoir(models.Model):
         emails.send_templated(
             request, 'notify_vote', context, None, [self.courriel]
         )
+
+    def uri(self):
+        return reverse('uuid', args=(self.uuid,))
