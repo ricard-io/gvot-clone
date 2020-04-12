@@ -2,11 +2,25 @@ import csv
 
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import FormView, RedirectView, detail
 
 from wagtail.admin import messages
 
 from . import forms, models
+
+
+class RootUUID(detail.SingleObjectMixin, RedirectView):
+    http_method_names = ['get']
+    model = models.Pouvoir
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
+
+    def get_redirect_url(self, *args, **kwargs):
+        pouvoir = self.get_object()
+        s = pouvoir.scrutin
+        return s.url_path + s.reverse_subpage(
+            name='scrutin-uuid', args=(pouvoir.uuid,)
+        )
 
 
 class ImportIndex(FormView):
