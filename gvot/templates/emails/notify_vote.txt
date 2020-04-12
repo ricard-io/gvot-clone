@@ -6,7 +6,7 @@ Nous avons bien enregistré votre vote pour le scrutin
 
 Vous pouvez à tout moment jusque la fin du scrutin retrouver votre contribution
 et éventuellement la corriger à cette adresse :
-{{ request.scheme }}://{{ request.get_host }}{{ pouvoir.scrutin.url_path }}{{ pouvoir.uuid }}
+{{ request.scheme }}://{{ request.get_host }}{% url 'uuid' pouvoir.uuid %}
 
 Merci pour votre participation.
 L'équipe organisatrice

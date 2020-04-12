@@ -219,7 +219,6 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             return super().serve(request, *args, **kwargs)
         raise Http404
 
-    # FIXME: c'est contreproductif de mettre l'uuid sous le path
     @route(r'(?P<uuid>' + UUIDConverter.regex + ')', name='scrutin-uuid')
     def uuid_way(self, request, uuid, *args, **kwargs):
         pouvoir = get_object_or_404(Pouvoir, uuid=uuid)
