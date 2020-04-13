@@ -77,7 +77,11 @@ class ImportConfirm(FormView):
         self.remplace = self.request.session.get('remplace', None)
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.csv_file or not self.scrutin:
+        if (
+            not self.csv_file
+            or not self.scrutin
+            or not models.Scrutin.objects.filter(id=self.scrutin).exists()
+        ):
             return redirect(reverse('import:index'))
         return super().dispatch(request, *args, **kwargs)
 
