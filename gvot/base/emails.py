@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail.message import EmailMultiAlternatives
@@ -5,7 +7,7 @@ from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
 
 
-def send_templated(request, base_tpl, context, sender, recipients, **kwargs):
+def prepare_templated(request, base_tpl, context):
     def render_subject():
         template = "emails/{}.subject".format(base_tpl)
         subject = render_to_string(template, context)
@@ -29,14 +31,38 @@ def send_templated(request, base_tpl, context, sender, recipients, **kwargs):
 
     subject = render_subject()
     message = render_message()
+    try:
+        html_message = render_message(html=True)
+    except TemplateDoesNotExist:
+        html_message = None
 
+    return subject, message, html_message
+
+
+def send_templated(request, base_tpl, context, sender, recipients, **kwargs):
+    subject, message, html = prepare_templated(request, base_tpl, context)
     email_message = EmailMultiAlternatives(
         subject, message, sender, recipients, **kwargs
     )
-    try:
-        html_message = render_message(html=True)
-        email_message.attach_alternative(html_message, 'text/html')
-    except TemplateDoesNotExist:
-        pass
-
+    if html:
+        email_message.attach_alternative(html, 'text/html')
     email_message.send()
+
+
+def preview_templated(request, base_tpl, context, sender, recipients, **kwargs):
+    subject, message, html = prepare_templated(request, base_tpl, context)
+    if html:
+        # Q&D body extraction
+        html_parts = re.split(
+            r'<\/?\s*body\b.*?>', html, maxsplit=2, flags=re.I | re.M | re.S
+        )
+        if len(html_parts) == 3:
+            html = html_parts[1]
+        else:
+            html = """
+            <div class="help-block help-critical">
+            Erreur de prévisualisation HTML.<br>
+            Vérifiez que votre template HTML est correct.
+            </div>
+            """
+    return subject, message, html
