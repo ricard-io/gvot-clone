@@ -305,6 +305,28 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     def get_submission_class(self):
         return Vote
 
+    def preview_mailling(self, request):
+        context = {
+            'pouvoir': Pouvoir(
+                scrutin=self,
+                nom=request.user.last_name,
+                prenom=request.user.first_name,
+                courriel=request.user.email,
+            )
+        }
+        return emails.preview_templated(
+            request, 'mailling', context, None, [request.user.email]
+        )
+
+    def send_mailling(self, request, qs):
+        for p in qs.values():
+            emails.send_templated(
+                request, 'mailling', {'pouvoir': p}, None, [request.user.email]
+            )
+
+    def pondere(self):
+        return self.pouvoir_set.exclude(ponderation=1).exists()
+
 
 class Pouvoir(models.Model):
     uuid = models.UUIDField(

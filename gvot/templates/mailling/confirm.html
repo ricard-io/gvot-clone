@@ -1,0 +1,55 @@
+{% extends "modeladmin/create.html" %}
+{% load static accessors modeladmin_tags %}
+
+{% block titletag %}Démarrer un mailling (2/2){% endblock %}
+
+{% block content %}
+  {% include "wagtailadmin/shared/header.html" with title="Démarrer un mailling" icon="download" subtitle=" Analyse du mailling avant validation" %}
+
+<div class="nice-padding">
+  <div class="overflow">
+    <section>
+        <h2>Résumé</h2>
+
+        <p>
+        Vous êtes sur le point d'envoyer un mailling à <strong>{{ dests }}</strong> au scrutin « {{ scrutin.title }} ».
+        </p>
+        <div class="help-block help-info">
+          Cette action va engendrer une file de <strong>{{ nb }}</strong> courriel{{ nb | pluralize }}.
+        </div>
+        <hr>
+        <h2>Prévisualisation de l'email</h2>
+        <h3>Sujet : {{ preview.subject }}</h3>
+        {% if preview.html %}
+          <div class="col6">
+            <h3>Version texte</h3>
+        {% endif %}
+        <pre>{{ preview.txt }}</pre>
+        {% if preview.html %}
+          </div>
+          <div class="col6">
+            <h3>Version HTML</h3>
+          <div>{{ preview.html | safe }}</div>
+          </div>
+        {% endif %}
+        </ul>
+      </section>
+  </div>
+</div>
+
+<form action="" method="POST" novalidate>
+  {% csrf_token %}
+  {{ form }}
+  <footer role="contentinfo">
+    <ul>
+      <li class="actions">
+        <div class="dropdown dropup dropdown-button match-width">
+          <button type="submit" class="button action-save button-longrunning{% if import_ko %} disabled{% endif %}" data-clicked-text="Envoyer le mailling">
+            <span class="icon icon-spinner"></span><em>{% if import_ko %}Impossible d'{% endif %}Envoyer le mailling</em>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </footer>
+</form>
+{% endblock %}

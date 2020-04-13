@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <title>
+    Ouverture du scrutin « {{ pouvoir.scrutin.title }} »
+  </title>
+</head>
+<body>
+<p>
+  Bonjour {{ pouvoir.prenom }} {{ pouvoir.nom }},
+</p>
+<p>
+  Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est ouvert.
+  <br>
+  Il sera clos ce dimanche 19 avril 2020 à 20h.
+</p>
+<p>
+  Pour voter, visitez simplement le site suivant et suivez les instructions :
+  <br>
+  <a rel="noreferrer" href="{{ request.base_url }}{{ pouvoir.uri }}">
+    {{ request.base_url }}{{ pouvoir.uri }}
+  </a>
+
+</p>
+{% if pouvoir.scrutin.pondere %}
+  <p>
+    Étant donné les conditions du scrutin, votre vote sera pondéré de {{ pouvoir.ponderation }} voix.
+  </p>
+{% endif %}
+
+<p>
+  À l'issue de votre participation, un courriel de confirmation vous sera renvoyé.
+</p>
+<p>
+  Vous pourrez à tout moment jusque la fin du scrutin retrouver votre contribution
+  et éventuellement la corriger à cette même adresse.
+</p>
+<p>
+  Merci pour votre participation.
+  <br>
+  L'équipe organisatrice
+</p>
+<hr>
+<p>
+  Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.<br>
+  Pour plus d'informations :
+  <a rel="noreferrer" href="{{ request.base_url }}">
+    {{ request.base_url }}
+  </a>
+</p>
+<p>
+  En cas de difficultés : <a href="mailto:{{ settings.assistance }}">contactez l'assistance</a>.
+</p>
+</body>
+</html>

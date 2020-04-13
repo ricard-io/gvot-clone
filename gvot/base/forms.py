@@ -7,6 +7,27 @@ from django.utils.safestring import mark_safe
 from .models import Scrutin as Scrutin
 
 
+class MaillingForm(forms.Form):
+    """
+    Formulaire pour les emaillings.
+    """
+
+    scrutin = forms.ModelChoiceField(
+        queryset=Scrutin.objects,
+        empty_label="Sélectionnez un scrutin",
+        help_text="Les destinataires considérés seront ceux liés à ce scrutin.",
+    )
+
+    dests = forms.ChoiceField(
+        choices=[
+            (None, "Sélectionnez les destinataires"),
+            ('tous', "Tous les participants"),
+            ('exprimes', "Tous les participants ayant voté"),
+            ('abstenus', "Tous les participants n'ayant pas encore voté"),
+        ],
+    )
+
+
 class ImportForm(forms.Form):
     """
     Formulaire pour les imports CSV des pouvoirs.

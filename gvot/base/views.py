@@ -23,6 +23,88 @@ class RootUUID(detail.SingleObjectMixin, RedirectView):
         )
 
 
+class MaillingIndex(FormView):
+    form_class = forms.MaillingForm
+    template_name = 'mailling/index.html'
+    success_url = reverse_lazy('mailling:confirm')
+
+    def form_valid(self, form):
+        # save data in session
+        self.request.session['scrutin'] = form.cleaned_data['scrutin'].id
+        self.request.session['dests'] = form.cleaned_data['dests']
+        return super().form_valid(form)
+
+    def get_error_message(self):
+        return "Le mailling n'a pas été poursuivi du fait d'erreurs."
+
+    def form_invalid(self, form):
+        messages.validation_error(self.request, self.get_error_message(), form)
+        return self.render_to_response(self.get_context_data())
+
+
+class MaillingConfirm(FormView):
+    form_class = forms.forms.Form
+    template_name = 'mailling/confirm.html'
+    success_url = reverse_lazy('base_pouvoir_modeladmin_index')
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.scrutin = self.request.session.get('scrutin', None)
+        self.dests = self.request.session.get('dests', None)
+
+    def dispatch(self, request, *args, **kwargs):
+        if (
+            not self.dests
+            or not self.scrutin
+            or not models.Scrutin.objects.filter(id=self.scrutin).exists()
+        ):
+            return redirect(reverse('mailling:index'))
+        pouvoirs = models.Pouvoir.objects.filter(scrutin_id=self.scrutin)
+        if self.dests == 'tous':
+            self.qs = pouvoirs
+        elif self.dests == 'exprimes':
+            self.qs = pouvoirs.exclude(vote__isnull=True)
+        elif self.dests == 'abstenus':
+            self.qs = pouvoirs.filter(vote__isnull=True)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        models.Scrutin.objects.get(id=self.scrutin).send_mailling(
+            self.request, self.qs
+        )
+        messages.success(self.request, "Mailling démarré avec succès.")
+
+        # drop now obsolete session data
+        self.request.session.pop('scrutin', False)
+        self.request.session.pop('dests', False)
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        scrutin = models.Scrutin.objects.get(id=self.scrutin)
+        context['scrutin'] = scrutin
+        context['nb'] = self.qs.count()
+        if self.dests == 'tous':
+            context['dests'] = "tous les participants"
+        elif self.dests == 'exprimes':
+            context['dests'] = "tous les participants ayant voté"
+        elif self.dests == 'abstenus':
+            context['dests'] = "tous les participants n'ayant pas encore voté"
+        context['preview'] = dict(zip(
+            ['subject', 'txt', 'html'], scrutin.preview_mailling(self.request)
+        ))
+        return context
+
+    def get_error_message(self):
+        return "L'import n'a pas été poursuivi du fait d'erreurs."
+
+    def form_invalid(self, form):
+        messages.validation_error(self.request, self.get_error_message(), form)
+        return self.render_to_response(self.get_context_data())
+
+
 class ImportIndex(FormView):
     form_class = forms.ImportForm
     template_name = 'import/index.html'

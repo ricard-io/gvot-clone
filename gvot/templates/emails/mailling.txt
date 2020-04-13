@@ -1,0 +1,25 @@
+{% autoescape off %}
+Bonjour {{ pouvoir.prenom }} {{ pouvoir.nom }},
+
+Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est ouvert.
+Il sera clos ce dimanche 19 avril 2020 à 20h.
+
+Pour voter, visitez simplement le site suivant et suivez les instructions :
+{{ request.base_url }}{{ pouvoir.uri }}
+{% if pouvoir.scrutin.pondere %}
+Étant donné les conditions du scrutin, votre vote sera pondéré de {{ pouvoir.ponderation }} voix.
+{% endif %}
+À l'issue de votre participation, un courriel de confirmation vous sera renvoyé.
+
+Vous pourrez à tout moment jusque la fin du scrutin retrouver votre contribution
+et éventuellement la corriger à cette même adresse.
+
+Merci pour votre participation.
+L'équipe organisatrice
+
+---
+Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.
+Pour plus d'informations : {{ request.base_url }}
+
+En cas de difficultés : {{ settings.assistance }}
+{% endautoescape %}
