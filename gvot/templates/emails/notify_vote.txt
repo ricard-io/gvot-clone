@@ -10,11 +10,10 @@ et éventuellement la corriger à cette adresse :
 
 Merci pour votre participation.
 L'équipe organisatrice
----
 
+---
 Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.
 Pour plus d'informations : {{ request.base_url }}
 
 En cas de difficultés : {{ settings.assistance }}
-
 {% endautoescape %}
