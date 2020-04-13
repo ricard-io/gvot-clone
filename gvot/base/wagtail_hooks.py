@@ -6,7 +6,7 @@ from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.options import ModelAdmin, modeladmin_register
 from wagtail.core import hooks
 
-from . import import_urls, mailling_urls
+from . import import_urls, mailling_urls, scrutin_urls
 from .models import Pouvoir
 from .templatetags.minified import minified
 
@@ -67,6 +67,7 @@ def register_admin_urls():
     return [
         path('import-pouvoir/', include(import_urls, namespace='import')),
         path('mailling-pouvoir/', include(mailling_urls, namespace='mailling')),
+        path('scrutin/', include(scrutin_urls, namespace='scrutin')),
     ]
 
 

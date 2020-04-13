@@ -9,6 +9,28 @@ from wagtail.admin import messages
 from . import forms, models
 
 
+class ScrutinAdd(RedirectView):
+    http_method_names = ['get']
+
+    def get_redirect_url(self, *args, **kwargs):
+        index = models.ScrutinIndex.objects.last()
+        if not index:
+            root = models.SitePage.objects.first()
+            if not root:
+                messages.error(
+                    self.request,
+                    "Impossible de trouver la racine de votre site.",
+                )
+                return reverse('wagtailadmin_home')
+            messages.warning(
+                self.request,
+                "Impossible de trouver une page d'index des formulaires. "
+                "Veillez d'abord en ajouter une.",
+            )
+            return reverse('wagtailadmin_pages:add_subpage', args=(root.id,))
+        return reverse('wagtailadmin_pages:add_subpage', args=(index.id,))
+
+
 class RootUUID(detail.SingleObjectMixin, RedirectView):
     http_method_names = ['get']
     model = models.Pouvoir
