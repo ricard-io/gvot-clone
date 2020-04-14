@@ -2,6 +2,7 @@ import re
 
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mass_mail
 from django.core.mail.message import EmailMultiAlternatives
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
@@ -37,6 +38,19 @@ def prepare_templated(request, base_tpl, context):
         html_message = None
 
     return subject, message, html_message
+
+
+def send_mass_templated(request, base_tpl, sender, datas, **kwargs):
+    mass_messages = []
+    for context, recipients in datas:
+        subject, message, html = prepare_templated(request, base_tpl, context)
+        email_message = EmailMultiAlternatives(
+            subject, message, sender, recipients, **kwargs
+        )
+        if html:
+            email_message.attach_alternative(html, 'text/html')
+        mass_messages.append((subject, email_message, None, recipients))
+    return send_mass_mail(mass_messages)
 
 
 def send_templated(request, base_tpl, context, sender, recipients, **kwargs):

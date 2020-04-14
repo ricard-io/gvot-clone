@@ -319,10 +319,14 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         )
 
     def send_mailling(self, request, qs):
-        for p in qs.values():
-            emails.send_templated(
-                request, 'mailling', {'pouvoir': p}, None, [request.user.email]
-            )
+        # FIXME : bug avec qs.values car empèche le parcours de scrutin :
+        # donc doit ajouter la version dict du scrutin
+        # En l'état peut fuiter des infos via les templates
+        datas = [
+            ({'pouvoir': p}, (p.courriel,))
+            for p in qs.select_related('scrutin')
+        ]
+        emails.send_mass_templated(request, 'mailling', None, datas)
 
     def pondere(self):
         return self.pouvoir_set.exclude(ponderation=1).exists()
@@ -361,6 +365,7 @@ class Pouvoir(models.Model):
         return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
 
     def notify_vote(self, request):
+        # FIXME: en l'état peut fuiter des infos via les templates
         context = {'pouvoir': self}
         emails.send_templated(
             request, 'notify_vote', context, None, [self.courriel]
