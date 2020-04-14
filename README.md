@@ -62,6 +62,21 @@ To update it, once the source code is checked out, simply run `make update`.
 You can also check that your application is well configured by running
 `make check`.
 
+In a production setup, you will need to add cron jobs in order to flush mail
+queues:
+```
+* * * * * (/path/to/your/python /path/to/your/manage.py send_mail >> ~/cron_mail.log 2>&1)
+0,20,40 * * * * (/path/to/your/python /path/to/your/manage.py retry_deferred >> ~/cron_mail_deferred.log 2>&1)
+0 0 * * * (/path/to/your/python /path/to/your/manage.py purge_mail_log 7 >> ~/cron_mail_purge.log 2>&1)
+```
+
+See
+https://github.com/pinax/django-mailer/blob/master/docs/usage.rst#clear-queue-with-command-extensions
+for more on this.
+
+If you don't want to be able to send hundreds of emails you might drop
+EMAIL_BACKEND from the settings and forget the cron.
+
 ### Manual installation
 
 If you don't want to use the `Makefile` facilities, here is what is done behind the scene.
@@ -104,6 +119,8 @@ check that everything is working fine with:
 
 ## Deployment
 
+### Web server
+
 Here is an example deployment using NGINX - as the Web server - and uWSGI - as
 the application server.
 
@@ -135,6 +152,21 @@ location = /favicon.ico {
     access_log off;
 }
 ```
+
+### Emails
+
+In a production setup, you will need to add cron jobs in order to flush mail
+queues:
+```
+* * * * * (/path/to/your/python /path/to/your/manage.py send_mail >> ~/cron_mail.log 2>&1)
+0,20,40 * * * * (/path/to/your/python /path/to/your/manage.py retry_deferred >> ~/cron_mail_deferred.log 2>&1)
+0 0 * * * (/path/to/your/python /path/to/your/manage.py purge_mail_log 7 >> ~/cron_mail_purge.log 2>&1)
+```
+
+See
+https://github.com/pinax/django-mailer/blob/master/docs/usage.rst#clear-queue-with-command-extensions
+for more on this.
+
 
 ## Structure
 ### Overview
