@@ -60,7 +60,7 @@ endif
 
 # Définition des cibles -------------------------------------------------------
 
-.PHONY: clean-pyc clean-build clean-static clear-venv help check check-config
+.PHONY: clean-pyc clean-build clean-static clear-venv help check check-config docs clean-docs
 .DEFAULT_GOAL := help
 
 # Commentaire d'une cible : #-> interne ##-> aide production+dev ###-> aide dev
@@ -160,3 +160,11 @@ fix-lint: ### corrige la syntaxe et ordonne les imports python
 ifdef USE_BLACK
 	$(PYTHON) -m black gvot
 endif
+
+## Cibles pour la documentation
+
+docs: ## construit la documentation
+	$(MAKE) -C docs/ html SPHINXBUILD=../$(VENV_DIR)/bin/sphinx-build
+
+clean-docs:  ## supprime la documentation (docs/build)
+	$(MAKE) -C docs/ clean SPHINXBUILD=../$(VENV_DIR)/bin/sphinx-build

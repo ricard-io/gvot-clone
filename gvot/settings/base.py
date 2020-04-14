@@ -262,3 +262,8 @@ WAGTAIL_ENABLE_UPDATE_CHECK = False
 # ------------------------------------------------------------------------------
 # APPLICATION AND 3RD PARTY LIBRARY SETTINGS
 # ------------------------------------------------------------------------------
+
+# DOCS
+# ------------------------------------------------------------------------------
+# https://django-docs.readthedocs.io/en/latest/
+DOCS_ROOT = base_dir('docs/build/html')

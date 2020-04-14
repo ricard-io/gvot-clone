@@ -9,14 +9,12 @@ from wagtail.documents import urls as wagtaildocs_urls
 from .base import views
 
 urlpatterns = [
-    path('django-admin/', admin.site.urls),
-
     # Wagtail's applications
     path('admin/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
 
     # Local applications
-    # ...
+    path('docs/', include('docs.urls')),
 ]
 
 if settings.DEBUG:

@@ -10,3 +10,9 @@ django-mailer >=2.0,<2.1 # https://github.com/pinax/django-mailer
 wagtail >=2.7,<2.8  # https://wagtail.io
 wagtailembedpeertube # https://forge.cliss21.org/cliss21/wagtailembedpeertube
 wagtailmenus >=3.0,<3.1  # https://github.com/rkhleics/wagtailmenus
+
+# Documentation
+# ------------------------------------------------------------------------------
+sphinx
+sphinx-rtd-theme
+django-docs

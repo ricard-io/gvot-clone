@@ -40,3 +40,5 @@ var/
 
 # Asset builds hidden in developp branch
 gvot/static/
+styleguide/index.html                                                           
+docs/build/

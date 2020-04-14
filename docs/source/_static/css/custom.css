@@ -1,0 +1,4 @@
+/* Hide autoclass name; we only want docstrings */
+.rst-content dl.class > dt {
+  display: none;
+}
