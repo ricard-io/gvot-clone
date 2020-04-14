@@ -9,6 +9,7 @@ THIRD_PARTY_APPS = [
     'wagtail.contrib.routable_page',
     'wagtailmenus',
     'widget_tweaks',
+    'mailer',
 ]
 
 WAGTAILMENUS_FLAT_MENUS_HANDLE_CHOICES = (('footer', 'Menu de pied de page'),)

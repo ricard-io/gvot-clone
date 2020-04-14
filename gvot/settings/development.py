@@ -22,6 +22,8 @@ ALLOWED_HOSTS = env.list(
 # https://docs.djangoproject.com/en/stable/topics/email/#email-backends
 # https://django-environ.readthedocs.io/en/stable/#supported-types
 vars().update(env.email_url('DJANGO_EMAIL_URL', default='consolemail://'))
+MAILER_EMAIL_BACKEND = EMAIL_BACKEND  # noqa
+EMAIL_BACKEND = 'mailer.backend.DbBackend'
 
 # WAGTAIL
 # ------------------------------------------------------------------------------

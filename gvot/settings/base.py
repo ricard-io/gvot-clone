@@ -11,7 +11,7 @@ import os.path
 from email.utils import getaddresses
 
 from . import base_dir, env, root_dir
-from .gvot import *
+from .gvot import *  # noqa
 
 # ENVIRONMENT VARIABLES AND PATHS
 # ------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ WAGTAIL_APPS = [
 LOCAL_APPS = ['gvot.base']
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + WAGTAIL_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + WAGTAIL_APPS + THIRD_PARTY_APPS + LOCAL_APPS  # noqa
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -223,6 +223,8 @@ FIXTURE_DIRS = [root_dir('fixtures')]
 # https://docs.djangoproject.com/en/stable/topics/email/#email-backends
 # https://django-environ.readthedocs.io/en/stable/#supported-types
 vars().update(env.email_url('DJANGO_EMAIL_URL', default='smtp://localhost:25'))
+MAILER_EMAIL_BACKEND = EMAIL_BACKEND  # noqa
+EMAIL_BACKEND = 'mailer.backend.DbBackend'
 
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 # Use the same email address for error messages
