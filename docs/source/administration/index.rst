@@ -28,7 +28,7 @@ Sur le serveur de production :
 Utilisation du compte administrateur
 ====================================
 
-L'accès à l'administration se fait à l'emplacement `/admin`.
+L'accès à l'administration se fait à l'emplacement ``/admin``.
 
 Une fois connecté avec le compte administrateur, le CMS Wagtail est pleinement
 utilisable.
@@ -109,8 +109,8 @@ Vous pouvez démarrer une importation de pouvoirs, directement depuis le panel
 « Pouvoirs ».
 
 Le format d'entrée doit être un fichier « CSV » dans un codage utf-8 ;
-séparateur : « , » ; délimiteur de texte : « " » (doubles quotes). Un exemple
-est proposé au téléchargement.
+séparateur : « ``,`` » ; délimiteur de texte : « ``"`` » (doubles quotes). Un
+exemple est proposé au téléchargement.
 
 Les colonnes attendues sont : « nom », « prenom », « courriel », « contact » et
 « ponderation ».
