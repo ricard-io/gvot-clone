@@ -1,0 +1,42 @@
+// -----------------------------------------------------------------------------
+// Richtext
+// -----------------------------------------------------------------------------
+
+.richtext-image.left {
+  @extend .img-thumbnail;
+  float: left;
+  max-width: 33%;
+  height: auto;
+  margin-right: 2rem;
+  @include media-breakpoint-down(md) {
+    max-width: 50%;
+  }
+  @include media-breakpoint-down(xs) {
+    float: none;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+.richtext-image.right {
+  @extend .img-thumbnail;
+  float: right;
+  max-width: 33%;
+  height: auto;
+  margin-left: 2rem;
+  @include media-breakpoint-down(md) {
+    max-width: 50%;
+  }
+  @include media-breakpoint-down(xs) {
+    float: none;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+}
+
+.richtext-image.full-width {
+  @extend .img-thumbnail;
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+}
