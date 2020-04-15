@@ -219,7 +219,7 @@ class ImportConfirm(FormView):
 
         datas = [
             {
-                k.strip(): v.strip()
+                k.strip(): v.strip() if isinstance(v, str) else v
                 for k, v in r.items()
                 if k.strip() in self.champs
             }
