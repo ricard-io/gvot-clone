@@ -1,5 +1,5 @@
-Documentation de GvoT
-*********************
+Documentation de **GvoT**
+*************************
 
 **GvoT** est une application Web visant à permettre le vote en ligne à
 large échelle dans les organisations.

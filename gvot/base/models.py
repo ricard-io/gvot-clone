@@ -117,8 +117,6 @@ class ClosedScrutin(Exception):
     pass
 
 
-# TODO: email d'annonce
-# TODO: email de rappel
 # TODO: afficher ouverture du scrutin dans la liste des scrutins
 class Scrutin(RoutablePageMixin, AbstractEmailForm):
     """
@@ -332,6 +330,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         return self.pouvoir_set.exclude(ponderation=1).exists()
 
 
+# FIXME: manque de manipulation en masse ? (suppression, compte)
 class Pouvoir(models.Model):
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
