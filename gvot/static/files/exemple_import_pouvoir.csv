@@ -1,0 +1,5 @@
+nom,prenom,courriel,contact,ponderation
+Jacques,Tati,jacques@tati.film
+Mon,Oncle,monOncle@provider.tld,Également joignable en demandant au café du coin de prévenir la voisine qui enverra son garçon taper au carreau de la fenêtre.,
+Poulain,François,fpoulain@provider.tld,"Notez que entre « quotes » vous pouvez mettre des virgules.",3
+Poulain,Francois,fpoulain@another.tld,"Notez qu'il est possible d'insérer des doubles quotes("") en les doublant.",42
