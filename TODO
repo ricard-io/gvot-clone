@@ -1,0 +1,24 @@
+[ ] préparation, mise en place, suivi
+[x] skin
+
+[x] email d'annonce
+[ ] email à la carte (de rappel, de confirmation, ...)
+[ ] se faire renvoyer ses codes à partir de son email
+
+[x] intégrer https://github.com/pinax/django-mailer/ et tester avec 4000 emails
+
+[x] doc
+
+[ ] attraper les bounces avec du VERP
+
+[x] considérer scrutin ouvert ou pas (avec commutateur)
+[x] mettre les questions dans un panel séparé
+
+[x] considérer des poids au pouvoir
+[ ] considérer de possibles collèges
+
+[ ] chiffrer le scrutin ? Block chainer le scrutin ?
+
+[ ] hasher le résultat ?
+
+[ ] ajouter les perms pour isoler les scrutins de différents utilisateurs
