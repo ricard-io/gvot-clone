@@ -1,0 +1,7 @@
+{% extends 'tapeforms/fields/bootstrap.html' %}
+
+{% block help_text %}
+  {% if help_text %}
+    <div class="alert alert-info form-text"><i class="fa fa-question-circle mr-2"></i>{{ help_text }}</div>
+  {% endif %}
+{% endblock %}

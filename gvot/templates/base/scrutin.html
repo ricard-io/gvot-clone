@@ -20,12 +20,7 @@
       <article>
         <form class="p-3" action="" method="post">
           {% csrf_token %}
-          <div class="invalid-feedback">
-            {{ form.non_field_errors }}
-          </div>
-          {% for field in form %}
-            {% include "./includes/formfield.html" with label_class="h3" collapse=False %}
-          {% endfor %}
+          {{ form.as_tapeform }}
           <div>
             <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
           </div>

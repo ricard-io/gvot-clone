@@ -1,0 +1,15 @@
+{% extends 'tapeforms/fields/default.html' %}
+
+{% block field %}
+  {% block help_text %}
+    {{ block.super }}
+  {% endblock %}
+  
+  {% block widget %}
+    {{ block.super }}
+  {% endblock %}
+  
+  {% block errors %}
+    {{ block.super }}
+  {% endblock %}
+{% endblock %}

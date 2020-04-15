@@ -32,6 +32,7 @@ from wagtail.core.models import Page
 from wagtail.search import index
 
 from . import blocks, emails
+from .tapeforms import BigLabelTapeformMixin
 
 
 class SitePage(Page):
@@ -251,6 +252,12 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             pouvoir=pouvoir, page=self
         ).exists()
         return render(request, self.get_template(request), context)
+
+    def get_form_class(self):
+        # Dynamically inherit Tapeform properties
+        return type(
+            'DynForm', (BigLabelTapeformMixin, super().get_form_class()), {}
+        )
 
     def get_form(self, *args, **kwargs):
         form_class = self.get_form_class()

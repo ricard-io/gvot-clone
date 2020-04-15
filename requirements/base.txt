@@ -2,8 +2,8 @@
 # ------------------------------------------------------------------------------
 django >=2.2,<2.3  # https://www.djangoproject.com/
 django-environ ==0.4.5  # https://github.com/joke2k/django-environ
-django-widget-tweaks
 django-mailer >=2.0,<2.1 # https://github.com/pinax/django-mailer
+django-tapeforms
 
 # Wagtail
 # ------------------------------------------------------------------------------

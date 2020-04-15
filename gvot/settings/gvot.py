@@ -10,7 +10,7 @@ THIRD_PARTY_APPS = [
     'wagtail.contrib.modeladmin',
     'wagtail.contrib.routable_page',
     'wagtailmenus',
-    'widget_tweaks',
+    'tapeforms',
     'mailer',
     'docs',
 ]

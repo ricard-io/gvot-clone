@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
-from .models import Scrutin as Scrutin
+from .models import Scrutin
 
 
 class MaillingForm(forms.Form):
