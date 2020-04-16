@@ -7579,6 +7579,9 @@ a.text-dark:hover, a.text-dark:focus {
   font-size: 90%;
   color: #dc3545; }
 
+.navbar-dark .navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.95); }
+
 .richtext-image.left {
   float: left;
   max-width: 33%;
