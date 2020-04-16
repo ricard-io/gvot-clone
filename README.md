@@ -63,19 +63,8 @@ You can also check that your application is well configured by running
 `make check`.
 
 In a production setup, you will need to add cron jobs in order to flush mail
-queues:
-```
-* * * * * (/path/to/your/python /path/to/your/manage.py send_mail >> ~/cron_mail.log 2>&1)
-0,20,40 * * * * (/path/to/your/python /path/to/your/manage.py retry_deferred >> ~/cron_mail_deferred.log 2>&1)
-0 0 * * * (/path/to/your/python /path/to/your/manage.py purge_mail_log 7 >> ~/cron_mail_purge.log 2>&1)
-```
-
-See
-https://github.com/pinax/django-mailer/blob/master/docs/usage.rst#clear-queue-with-command-extensions
-for more on this.
-
-If you don't want to be able to send hundreds of emails you might drop
-EMAIL_BACKEND from the settings and forget the cron.
+queues. See below. If you don't want to be able to send hundreds of emails you
+might drop EMAIL_BACKEND from the settings and forget about it.
 
 ### Manual installation
 
@@ -158,9 +147,9 @@ location = /favicon.ico {
 In a production setup, you will need to add cron jobs in order to flush mail
 queues:
 ```
-* * * * * (/path/to/your/python /path/to/your/manage.py send_mail >> ~/cron_mail.log 2>&1)
-0,20,40 * * * * (/path/to/your/python /path/to/your/manage.py retry_deferred >> ~/cron_mail_deferred.log 2>&1)
-0 0 * * * (/path/to/your/python /path/to/your/manage.py purge_mail_log 7 >> ~/cron_mail_purge.log 2>&1)
+* * * * *       (/path/venv/bin/python /path/manage.py send_mail        >> /path/var/log/cron_mail.log 2>&1)
+0,20,40 * * * * (/path/venv/bin/python /path/manage.py retry_deferred   >> /path/var/log/cron_mail_deferred.log 2>&1)
+0 0 * * *       (/path/venv/bin/python /path/manage.py purge_mail_log 7 >> /path/var/log/cron_mail_purge.log 2>&1)
 ```
 
 See
