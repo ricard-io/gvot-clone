@@ -226,6 +226,8 @@ vars().update(env.email_url('DJANGO_EMAIL_URL', default='smtp://localhost:25'))
 MAILER_EMAIL_BACKEND = EMAIL_BACKEND  # noqa
 EMAIL_BACKEND = 'mailer.backend.DbBackend'
 
+MAILER_LOCK_PATH = var_dir('lock')
+
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 # Use the same email address for error messages
 SERVER_EMAIL = DEFAULT_FROM_EMAIL

@@ -104,3 +104,7 @@ if not os.path.isdir(var_dir('log')):
 # ------------------------------------------------------------------------------
 # APPLICATION AND 3RD PARTY LIBRARY SETTINGS
 # ------------------------------------------------------------------------------
+
+# MAILER
+if not os.path.isdir(var_dir('lock')):
+    os.mkdir(var_dir('lock'), mode=0o750)
