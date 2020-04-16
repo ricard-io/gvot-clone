@@ -18,7 +18,7 @@ def reset_home_page(apps, schema_editor):
     # Create home page
     homepage = SitePage.objects.create(
         title="Bienvenue sur votre nouveau site Wagtail !",
-        slug='homepage',
+        slug='',
         content_type=sitepage_content_type,
         path='00010002',
         depth=2,

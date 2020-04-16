@@ -40,7 +40,7 @@ class RootUUID(detail.SingleObjectMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pouvoir = self.get_object()
         s = pouvoir.scrutin
-        return s.url_path + s.reverse_subpage(
+        return s.url + s.reverse_subpage(
             name='scrutin-uuid', args=(pouvoir.uuid,)
         )
 
