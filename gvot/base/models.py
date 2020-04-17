@@ -313,6 +313,13 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     def pondere(self):
         return self.pouvoir_set.exclude(ponderation=1).exists()
 
+    # FIXME: à la création d'un scrutin, lui associer 2 nouveaux templates:
+    # - ouverture du scrutin
+    # - confirmation de vote
+    # - notification d'un tiers
+    # FIXME : ajouter le champ de sélection du template
+    #         de notification et de confirmation
+
 
 # FIXME: manque de manipulation en masse ? (suppression, compte)
 class Pouvoir(models.Model):

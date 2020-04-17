@@ -2,7 +2,7 @@
 [x] skin
 
 [x] email d'annonce
-[ ] email à la carte (de rappel, de confirmation, ...)
+[x] email à la carte (de rappel, de confirmation, ...)
 [ ] se faire renvoyer ses codes à partir de son email
 
 [x] intégrer https://github.com/pinax/django-mailer/ et tester avec 4000 emails

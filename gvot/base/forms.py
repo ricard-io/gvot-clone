@@ -18,6 +18,7 @@ class MaillingForm(forms.Form):
         help_text="Les destinataires considérés seront ceux liés à ce scrutin.",
     )
 
+    # FIXME: filtrer les templates pour exclure les confirmations de vote
     template = forms.ModelChoiceField(
         queryset=EmailTemplate.objects,
         help_text="Le modèle doit être liés à ce scrutin.",
@@ -33,7 +34,7 @@ class MaillingForm(forms.Form):
         ],
     )
 
-    # validation :
+    # FIXME: validation :
     # - scrutin
     # - templates
 
