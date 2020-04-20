@@ -172,7 +172,14 @@ class ImportConfirm(FormView):
     template_name = 'import/confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
 
-    champs = ['nom', 'prenom', 'courriel', 'contact', 'ponderation']
+    champs = [
+        'nom',
+        'prenom',
+        'collectif',
+        'courriel',
+        'contact',
+        'ponderation',
+    ]
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -233,6 +240,7 @@ class ImportConfirm(FormView):
 
     def crible_data(self):
         """Crible les lignes entre ce qu'on prend et ce qu'on rejette."""
+        # FIXME: avec les collectifs ça va devenir plus technique
         object_list = self.data_to_python()
         ok, warn, ko = [], [], []
 
@@ -257,6 +265,11 @@ class ImportConfirm(FormView):
 
         for index, obj in enumerate(object_list):
             try:
+                if not any([
+                    getattr(obj, f) for f in self.champs if f != 'ponderation'
+                ]):
+                    continue  # drop empty line
+
                 obj.full_clean()
 
                 if (

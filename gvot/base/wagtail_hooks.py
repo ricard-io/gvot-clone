@@ -41,16 +41,15 @@ class PouvoirButtonHelper(ButtonHelper):
         }
 
 
-# FIXME: cache l'uuid à terme ?
 @modeladmin_register
 class PouvoirAdmin(ModelAdmin):
     model = Pouvoir
     menu_icon = 'group'
     menu_label = "Pouvoirs"
     list_display = (
-        'uuid',
         'prenom',
         'nom',
+        'collectif',
         'courriel',
         'scrutin',
         'contact',

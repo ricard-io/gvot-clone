@@ -1,6 +1,7 @@
 import json
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import Http404, HttpResponseGone
@@ -343,8 +344,16 @@ class Pouvoir(models.Model):
         primary_key=True, default=uuid.uuid4, editable=False
     )
     scrutin = models.ForeignKey('Scrutin', on_delete=models.CASCADE)
-    nom = models.CharField(max_length=100)
-    prenom = models.CharField('Prénom', max_length=100)
+    nom = models.CharField(max_length=100, null=True, blank=True)
+    prenom = models.CharField('Prénom', max_length=100, null=True, blank=True)
+    collectif = models.CharField(
+        'Mandaire du collectif',
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="Le pouvoir doit au moins désigner un nom, "
+        "un prénom ou un nom de collectif."
+    )
     courriel = models.EmailField()
     contact = models.CharField(
         "Contact alternatif en cas de courriel en erreur",
@@ -359,16 +368,30 @@ class Pouvoir(models.Model):
     panels = [
         FieldPanel('scrutin'),
         FieldPanel('ponderation'),
-        MultiFieldPanel(
-            [FieldRowPanel([FieldPanel('nom'), FieldPanel('prenom')])],
-            "Identité",
+        MultiFieldPanel([
+                FieldRowPanel([FieldPanel('nom'), FieldPanel('prenom')]),
+                FieldPanel('collectif'),
+            ], "Identité",
         ),
         FieldPanel('courriel'),
         FieldPanel('contact'),
     ]
 
     def __str__(self):
+        if self.collectif:
+            return "{} ({})".format(self.collectif, self.uuid)
         return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if not any([self.nom, self.prenom, self.collectif]):
+            raise ValidationError(
+                "Le pouvoir doit au moins désigner un nom, "
+                "un prénom ou un nom de collectif."
+            )
 
     def notify_vote(self, request):
         # FIXME: en l'état peut fuiter des infos via les templates

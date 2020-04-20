@@ -7,12 +7,20 @@
 </head>
 <body>
 <p>
-  Bonjour {{ pouvoir.prenom }} {{ pouvoir.nom }},
+  Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom %} {{ pouvoir.nom }}{% endif %},
 </p>
 <p>
-  Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est ouvert.
+  Le scrutin intitulé « <strong>{{ pouvoir.scrutin.title }}</strong> » est annoncé.
+</p>
+{% if pouvoir.collectif %}
+<p>
+  Vous êtes invité à y participer en tant que {{ pouvoir.collectif }}.
+</p>
+{% endif %}
+<p>
+  Le scrutin sera <strong>ouvert</strong> ce lundi prochain <strong>à 8h</strong>.
   <br>
-  Il sera clos ce dimanche 19 avril 2020 à 20h.
+  Le scrutin sera <strong>clos</strong> ce vendredi prochain <strong>à 20h</strong>.
 </p>
 <p>
   Pour voter, visitez simplement le site suivant et suivez les instructions :
@@ -32,7 +40,7 @@
   À l'issue de votre participation, un courriel de confirmation vous sera renvoyé.
 </p>
 <p>
-  Vous pourrez à tout moment jusque la fin du scrutin retrouver votre contribution
+  Vous pourrez à tout moment et jusque la fin du scrutin retrouver votre contribution
   et éventuellement la corriger à cette même adresse.
 </p>
 <p>

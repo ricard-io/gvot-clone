@@ -4,7 +4,7 @@
 {% block content %}
   <h1>{{ page.title }}</h1>
   {% if not page.ouvert and not page.vote_set.exists %}
-    <div class="alert alert-info"><i class="fa fa-warning mr-2"></i>Ce scrutin n'est pas encore ouvert. Il est accessible à titre de test mais votre vote ne sera pas comptabilisé.</div>
+    <div class="alert alert-secondary"><i class="fa fa-warning mr-2"></i>Ce scrutin n'est pas encore ouvert. Il est accessible à titre de test mais votre vote ne sera pas comptabilisé.</div>
   {% elif not page.ouvert and page.vote_set.exists %}
     <div class="alert alert-danger"><i class="fa fa-warning mr-2"></i>Ce scrutin est désormais fermé. Veuillez vous rapprochez des organisateurs en cas de problème.</div>
   {% elif page.ouvert and deja_vote %}

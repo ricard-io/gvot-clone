@@ -37,7 +37,7 @@
                   {% if forloop.first %}
                     {{ index | add:2 }}
                   {% else %}
-                    {{ pouvoir | getattr:field | truncatechars:100 }}
+                    {{ pouvoir | getattr:field | default_if_none:'-' | truncatechars:100 }}
                     {% for error in exception.error_dict|get:field %}
                       {% for message in error.messages %}
                         <p class="error-message">
@@ -45,6 +45,15 @@
                         </p>
                       {% endfor %}
                     {% endfor %}
+                    {% if field == 'nom' %}
+                      {% for error in exception.error_dict|get:'__all__' %}
+                        {% for message in error.messages %}
+                          <p class="error-message">
+                            {{ message }}
+                          </p>
+                        {% endfor %}
+                      {% endfor %}
+                    {% endif %}
                   {% endif %}
                 </td>
               {% endfor %}
@@ -90,7 +99,7 @@
                         {{ warning }}
                       </p>
                   {% else %}
-                    {{ pouvoir | getattr:field | truncatechars:100 }}
+                    {{ pouvoir | getattr:field | default_if_none:'-' | truncatechars:100 }}
                   {% endif %}
                 </td>
               {% endfor %}
@@ -114,7 +123,7 @@
                 </th>
               {% else %}
                 <th id="{{ field }}">
-                  {{ model | verbose_fieldname:field | title }}
+                  {{ model | verbose_fieldname:field | default_if_none:'-' | title }}
                 </th>
               {% endif %}
             {% endfor %}

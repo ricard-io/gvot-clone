@@ -7,7 +7,7 @@
 </head>
 <body>
 <p>
-  Bonjour {{ pouvoir.prenom }} {{ pouvoir.nom }},
+  Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom %} {{ pouvoir.nom }}{% endif %},
 </p>
 <p>
   Nous avons bien enregistré votre vote pour le scrutin

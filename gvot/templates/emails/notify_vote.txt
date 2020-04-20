@@ -1,5 +1,5 @@
 {% autoescape off %}
-Bonjour {{ pouvoir.prenom }} {{ pouvoir.nom }},
+Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom %} {{ pouvoir.nom }}{% endif %},
 
 Nous avons bien enregistré votre vote pour le scrutin
 « {{ pouvoir.scrutin.title }} ».

@@ -1,8 +1,12 @@
 {% autoescape off %}
-Bonjour {{ pouvoir.prenom }} {{ pouvoir.nom }},
+Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom %} {{ pouvoir.nom }}{% endif %},
 
-Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est ouvert.
-Il sera clos ce dimanche 19 avril 2020 à 20h.
+Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est annoncé.
+{% if pouvoir.collectif %}
+Vous êtes invité à y participer en tant que {{ pouvoir.collectif }}.
+{% endif %}
+Le scrutin sera ouvert ce lundi prochain à 8h.
+Le scrutin sera clos ce vendredi prochain à 16h.
 
 Pour voter, visitez simplement le site suivant et suivez les instructions :
 {{ request.base_url }}{{ pouvoir.uri }}
@@ -11,8 +15,8 @@ Pour voter, visitez simplement le site suivant et suivez les instructions :
 {% endif %}
 À l'issue de votre participation, un courriel de confirmation vous sera renvoyé.
 
-Vous pourrez à tout moment jusque la fin du scrutin retrouver votre contribution
-et éventuellement la corriger à cette même adresse.
+Vous pourrez à tout moment et jusque la fin du scrutin retrouver votre
+contribution et éventuellement la corriger à cette même adresse.
 
 Merci pour votre participation.
 L'équipe organisatrice

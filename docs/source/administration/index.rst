@@ -33,7 +33,7 @@ L'accès à l'administration se fait à l'emplacement ``/admin``.
 Une fois connecté avec le compte administrateur, le CMS Wagtail est pleinement
 utilisable.
 
-.. note:: 
+.. note::
 
   À partir d'ici, nous recommandons fortement de découvrir la `documentation de
   Wagtail <https://docs.wagtail.io/en/v2.7/editor_manual/index.html>`_ avant de
@@ -97,8 +97,10 @@ Ajout des pouvoirs
 ^^^^^^^^^^^^^^^^^^
 
 Un pouvoir est un droit de vote, pondéré, associé à un scrutin. Pour des
-raisons d'organisation on y adjoint les noms, prénom et moyens de contact des
-participants.
+raisons d'organisation on y adjoint les noms, prénom (ou bien nom du collectif,
+le cas échéant) et moyens de contact des participants.
+
+Dans le cas d'un pouvoir destiné à un collectif,
 
 Vous pouvez ajouter un pouvoir directement depuis le panel « Pouvoirs ».
 
@@ -112,10 +114,14 @@ Le format d'entrée doit être un fichier « CSV » dans un codage utf-8 ;
 séparateur : « ``,`` » ; délimiteur de texte : « ``"`` » (doubles quotes). Un
 exemple est proposé au téléchargement.
 
-Les colonnes attendues sont : « nom », « prenom », « courriel », « contact » et
-« ponderation ».
+Les colonnes attendues sont : « nom », « prenom », « collectif » « courriel »,
+« contact » et « ponderation ».
 
-Les colonnes « nom », « prenom » et « courriel » ne peuvent être vides.
+Les colonnes « nom », « prenom » et « collectif » ne peuvent être vides toutes
+à la fois. Dit autrement le pouvoir doit au moins désigner un nom, un prénom
+ou un nom de collectif.
+
+La colonne « courriel » ne peut être vide.
 
 Une pondération absente sera interprétée à la valeur « 1 ».
 
