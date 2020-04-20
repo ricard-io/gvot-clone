@@ -240,16 +240,18 @@ class ImportConfirm(FormView):
 
     def crible_data(self):
         """Crible les lignes entre ce qu'on prend et ce qu'on rejette."""
-        # FIXME: avec les collectifs ça va devenir plus technique
         object_list = self.data_to_python()
         ok, warn, ko = [], [], []
+
+        # champs identifiants (doublons)
+        id_fields = ('nom', 'prenom', 'collectif', 'courriel')
 
         courriels_in_db = models.Pouvoir.objects.filter(
             scrutin_id=self.scrutin
         ).values_list('courriel')
         pouvoirs_in_db = models.Pouvoir.objects.filter(
             scrutin_id=self.scrutin
-        ).values_list(*self.champs)
+        ).values_list(*id_fields)
 
         courriels_in_import = set()
         pouvoirs_in_import = set()
@@ -272,15 +274,14 @@ class ImportConfirm(FormView):
 
                 obj.full_clean()
 
-                if (
-                    not self.remplace
-                    and (obj.nom, obj.prenom, obj.courriel) in pouvoirs_in_db
-                ):
+                signature = tuple([getattr(obj, f) for f in id_fields])
+
+                if not self.remplace and signature in pouvoirs_in_db:
                     warn.append((index, obj, warnings_msg[0]))
                 elif not self.remplace and (obj.courriel,) in courriels_in_db:
                     warn.append((index, obj, warnings_msg[1]))
 
-                if (obj.nom, obj.prenom, obj.courriel,) in courriels_in_import:
+                if signature in pouvoirs_in_import:
                     warn.append((index, obj, warnings_msg[2]))
                 elif (obj.courriel,) in courriels_in_import:
                     warn.append((index, obj, warnings_msg[3]))
@@ -288,7 +289,7 @@ class ImportConfirm(FormView):
                 if not warn or warn[-1][0] != index:
                     ok.append((index, obj, None))
                     courriels_in_import.add((obj.courriel,))
-                    pouvoirs_in_import.add((obj.nom, obj.prenom, obj.courriel))
+                    pouvoirs_in_import.add(signature)
             except Exception as exception:
                 ko.append((index, obj, exception))
         return ok, warn, ko
