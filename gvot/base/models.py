@@ -120,6 +120,8 @@ class ClosedScrutin(Exception):
 
 
 # TODO: afficher ouverture du scrutin dans la liste des scrutins
+# FIXME: revoir le workflow ouvert / fermé ; c'est une mauvaise bidouille
+# FIXME: ajouter un remerciement et une intro par défaut
 class Scrutin(RoutablePageMixin, AbstractEmailForm):
     """
     Elle sert à publier un scrutin pour une inscription à un évènement,
