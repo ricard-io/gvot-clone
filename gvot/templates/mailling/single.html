@@ -1,0 +1,37 @@
+{% extends "modeladmin/create.html" %}
+{% load static %}
+
+{% block titletag %}Envoyer un email (1/2){% endblock %}
+
+{% block header %}
+  {% include "wagtailadmin/shared/header.html" with title="Envoyer un email" icon="mail" subtitle=" Une page de confirmation vous sera soumise avant l'envoi effectif de l'email." %}
+{% endblock %}
+
+{% block form_action %}{% endblock %}
+
+{% block form %}
+  <ul class="objects">
+    <li class="object required file_field">
+      <div class="title-wrapper">
+        <label for="id_destinataires">
+          Message
+        </label>
+      </div>
+      <div class="object-layout">
+        <div class="object-layout_big-part">
+          <fieldset>
+            <p>L'envois en préparation concerne les transmissions des pouvoirs aux participants. Le choix dynamique n'est pas encore implanté.</p>
+          </fieldset>
+        </div>
+      </div>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block form_actions %}
+  <div class="dropdown dropup dropdown-button match-width">
+    <button type="submit" class="button action-save button-longrunning" data-clicked-text="Poursuivre">
+      <span class="icon icon-spinner"></span><em>Poursuivre</em>
+    </button>
+  </div>
+{% endblock %}

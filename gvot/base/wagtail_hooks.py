@@ -40,6 +40,30 @@ class PouvoirButtonHelper(ButtonHelper):
             'classname': cn,
         }
 
+    def mail_button(self, pk):
+        classnames = [
+            'button', 'button-small', 'button-secondary', 'icon', 'icon-mail'
+        ]
+        cn = self.finalise_classname(classnames)
+        return {
+            'url': reverse('mailling:single', args=(pk,)),
+            'title': 'Envoyer un email',
+            'label': 'Envoyer un email',
+            'classname': cn,
+        }
+
+    def get_buttons_for_obj(self, obj, exclude=None, classnames_add=None,
+                            classnames_exclude=None):
+        btns = super().get_buttons_for_obj(
+            obj,
+            exclude=exclude,
+            classnames_add=classnames_add,
+            classnames_exclude=classnames_exclude
+        )
+        pk = getattr(obj, self.opts.pk.attname)
+        btns.append(self.mail_button(pk))
+        return btns
+
 
 @modeladmin_register
 class PouvoirAdmin(ModelAdmin):

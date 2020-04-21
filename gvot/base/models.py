@@ -314,6 +314,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         return Vote
 
     def preview_mailling(self, request):
+        # FIXME: en l'état peut fuiter des infos via les templates
         context = {
             'pouvoir': Pouvoir(
                 scrutin=self,
@@ -404,3 +405,17 @@ class Pouvoir(models.Model):
 
     def uri(self):
         return reverse('uuid', args=(self.uuid,))
+
+    def preview_mail(self, request):
+        # FIXME: en l'état peut fuiter des infos via les templates
+        context = {'pouvoir': self}
+        return emails.preview_templated(
+            request, 'mailling', context, None, [self.courriel]
+        )
+
+    def send_mail(self, request):
+        # FIXME: en l'état peut fuiter des infos via les templates
+        context = {'pouvoir': self}
+        emails.send_templated(
+            request, 'mailling', context, None, [self.courriel]
+        )

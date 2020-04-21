@@ -31,17 +31,23 @@ class ScrutinAdd(RedirectView):
         return reverse('wagtailadmin_pages:add_subpage', args=(index.id,))
 
 
-class RootUUID(detail.SingleObjectMixin, RedirectView):
-    http_method_names = ['get']
+class PouvoirUUIDMixin(detail.SingleObjectMixin):
     model = models.Pouvoir
     slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.object = self.get_object()
+
+
+class RootUUID(PouvoirUUIDMixin, RedirectView):
+    http_method_names = ['get']
+
     def get_redirect_url(self, *args, **kwargs):
-        pouvoir = self.get_object()
-        s = pouvoir.scrutin
-        return s.url + s.reverse_subpage(
-            name='scrutin-uuid', args=(pouvoir.uuid,)
+        scrutin = self.object.scrutin
+        return scrutin.url + scrutin.reverse_subpage(
+            name='scrutin-uuid', args=(self.object.uuid,)
         )
 
 
@@ -49,6 +55,40 @@ class FormInvalidMixin:
     def form_invalid(self, form):
         messages.validation_error(self.request, self.get_error_message(), form)
         return self.render_to_response(self.get_context_data())
+
+
+class MaillingSingle(FormInvalidMixin, PouvoirUUIDMixin, FormView):
+    form_class = forms.forms.Form
+    template_name = 'mailling/single.html'
+
+    def get_success_url(self):
+        return reverse('mailling:single_confirm', args=(self.object.uuid,))
+
+    def get_error_message(self):
+        return "Le mailling n'a pas été poursuivi du fait d'erreurs."
+
+
+class MaillingSingleConfirm(FormInvalidMixin, PouvoirUUIDMixin, FormView):
+    form_class = forms.forms.Form
+    template_name = 'mailling/single_confirm.html'
+    success_url = reverse_lazy('base_pouvoir_modeladmin_index')
+
+    def form_valid(self, form):
+        self.object.send_mail(self.request)
+        messages.success(self.request, "Mailling démarré avec succès.")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pouvoir'] = self.object
+        context['scrutin'] = self.object.scrutin
+        context['preview'] = dict(zip(
+            ['subject', 'txt', 'html'], self.object.preview_mail(self.request)
+        ))
+        return context
+
+    def get_error_message(self):
+        return "L'import n'a pas été poursuivi du fait d'erreurs."
 
 
 class MaillingIndex(FormInvalidMixin, FormView):
