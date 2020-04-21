@@ -96,7 +96,7 @@ ifeq ($(READ_CONFIG_FILE), 1)
 	$(EDITOR) config.env
 endif
 
-update: check-config install-deps migrate static ## mets à jour l'application et ses dépendances
+update: check-config install-deps migrate static docs ## mets à jour l'application et ses dépendances
 	touch gvot/wsgi.py
 
 check: check-config ## vérifie la configuration de l'instance
