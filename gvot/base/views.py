@@ -45,7 +45,13 @@ class RootUUID(detail.SingleObjectMixin, RedirectView):
         )
 
 
-class MaillingIndex(FormView):
+class FormInvalidMixin:
+    def form_invalid(self, form):
+        messages.validation_error(self.request, self.get_error_message(), form)
+        return self.render_to_response(self.get_context_data())
+
+
+class MaillingIndex(FormInvalidMixin, FormView):
     form_class = forms.MaillingForm
     template_name = 'mailling/index.html'
     success_url = reverse_lazy('mailling:confirm')
@@ -59,12 +65,8 @@ class MaillingIndex(FormView):
     def get_error_message(self):
         return "Le mailling n'a pas été poursuivi du fait d'erreurs."
 
-    def form_invalid(self, form):
-        messages.validation_error(self.request, self.get_error_message(), form)
-        return self.render_to_response(self.get_context_data())
 
-
-class MaillingConfirm(FormView):
+class MaillingConfirm(FormInvalidMixin, FormView):
     form_class = forms.forms.Form
     template_name = 'mailling/confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
@@ -122,12 +124,8 @@ class MaillingConfirm(FormView):
     def get_error_message(self):
         return "L'import n'a pas été poursuivi du fait d'erreurs."
 
-    def form_invalid(self, form):
-        messages.validation_error(self.request, self.get_error_message(), form)
-        return self.render_to_response(self.get_context_data())
 
-
-class ImportIndex(FormView):
+class ImportIndex(FormInvalidMixin, FormView):
     form_class = forms.ImportForm
     template_name = 'import/index.html'
     success_url = reverse_lazy('import:confirm')
@@ -162,12 +160,8 @@ class ImportIndex(FormView):
     def get_error_message(self):
         return "L'import n'a pas été poursuivi du fait d'erreurs."
 
-    def form_invalid(self, form):
-        messages.validation_error(self.request, self.get_error_message(), form)
-        return self.render_to_response(self.get_context_data())
 
-
-class ImportConfirm(FormView):
+class ImportConfirm(FormInvalidMixin, FormView):
     form_class = forms.forms.Form
     template_name = 'import/confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
@@ -332,7 +326,3 @@ class ImportConfirm(FormView):
 
     def get_error_message(self):
         return "L'import n'a pas été poursuivi du fait d'erreurs."
-
-    def form_invalid(self, form):
-        messages.validation_error(self.request, self.get_error_message(), form)
-        return self.render_to_response(self.get_context_data())
