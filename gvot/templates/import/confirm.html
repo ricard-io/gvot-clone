@@ -137,7 +137,7 @@
                   {% if forloop.first %}
                     {{ index | add:2 }}
                   {% else %}
-                    {{ pouvoir | getattr:field }}
+                    {{ pouvoir | getattr:field | default_if_none:'-' }}
                   {% endif %}
                 </td>
               {% endfor %}
