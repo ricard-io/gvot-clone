@@ -262,7 +262,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
             {
                 k.strip(): v.strip() if isinstance(v, str) else v
                 for k, v in r.items()
-                if k.strip() in self.champs
+                if isinstance(k, str) and k.strip() in self.champs
             }
             for r in reader
         ]
