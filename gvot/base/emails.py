@@ -22,13 +22,17 @@ def prepare_templated(request, base_tpl, context):
             template = "emails/{}.html".format(base_tpl)
         return render_to_string(template, context)
 
-    context.update({
-        'site': get_current_site(request),
-        'settings': {'assistance': settings.ASSISTANCE},
-        'request': {
-            'base_url': "{}://{}".format(request.scheme, request.get_host()),
-        },
-    })
+    context.update(
+        {
+            'site': get_current_site(request),
+            'settings': {'assistance': settings.ASSISTANCE},
+            'request': {
+                'base_url': "{}://{}".format(
+                    request.scheme, request.get_host()
+                ),
+            },
+        }
+    )
 
     subject = render_subject()
     message = render_message()
@@ -64,7 +68,9 @@ def send_templated(request, base_tpl, context, sender, recipients, **kwargs):
     email_message.send()
 
 
-def preview_templated(request, base_tpl, context, sender, recipients, **kwargs):
+def preview_templated(
+    request, base_tpl, context, sender, recipients, **kwargs
+):
     subject, message, html = prepare_templated(request, base_tpl, context)
     if html:
         # Q&D body extraction

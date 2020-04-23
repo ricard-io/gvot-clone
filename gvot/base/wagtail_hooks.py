@@ -42,7 +42,11 @@ class PouvoirButtonHelper(ButtonHelper):
 
     def mail_button(self, pk):
         classnames = [
-            'button', 'button-small', 'button-secondary', 'icon', 'icon-mail'
+            'button',
+            'button-small',
+            'button-secondary',
+            'icon',
+            'icon-mail',
         ]
         cn = self.finalise_classname(classnames)
         return {
@@ -52,13 +56,14 @@ class PouvoirButtonHelper(ButtonHelper):
             'classname': cn,
         }
 
-    def get_buttons_for_obj(self, obj, exclude=None, classnames_add=None,
-                            classnames_exclude=None):
+    def get_buttons_for_obj(
+        self, obj, exclude=None, classnames_add=None, classnames_exclude=None
+    ):
         btns = super().get_buttons_for_obj(
             obj,
             exclude=exclude,
             classnames_add=classnames_add,
-            classnames_exclude=classnames_exclude
+            classnames_exclude=classnames_exclude,
         )
         pk = getattr(obj, self.opts.pk.attname)
         btns.append(self.mail_button(pk))
@@ -91,7 +96,9 @@ class PouvoirAdmin(ModelAdmin):
 def register_admin_urls():
     return [
         path('import-pouvoir/', include(import_urls, namespace='import')),
-        path('mailling-pouvoir/', include(mailling_urls, namespace='mailling')),
+        path(
+            'mailling-pouvoir/', include(mailling_urls, namespace='mailling')
+        ),
         path('scrutin/', include(scrutin_urls, namespace='scrutin')),
     ]
 
@@ -99,8 +106,11 @@ def register_admin_urls():
 @hooks.register('register_admin_menu_item')
 def register_forms_menu_item():
     return FormsMenuItem(
-        'Scrutins', reverse('wagtailforms:index'),
-        name='scrutins', classnames='icon icon-form', order=700
+        'Scrutins',
+        reverse('wagtailforms:index'),
+        name='scrutins',
+        classnames='icon icon-form',
+        order=700,
     )
 
 

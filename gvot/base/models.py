@@ -170,22 +170,16 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
                 FieldPanel('ouvert'),
                 FieldPanel('peremption'),
                 FieldPanel('prescription'),
-            ], "Aspects RGPD",
+            ],
+            "Aspects RGPD",
         ),
         FieldPanel('introduction'),
         FieldPanel('confirmation'),
-        MultiFieldPanel(
-            [
-                FieldPanel('action'),
-            ], "Appel à action"
-        ),
+        MultiFieldPanel([FieldPanel('action')], "Appel à action"),
         MultiFieldPanel(
             [
                 FieldRowPanel(
-                    [
-                        FieldPanel('from_address'),
-                        FieldPanel('to_address'),
-                    ]
+                    [FieldPanel('from_address'), FieldPanel('to_address')]
                 ),
                 FieldPanel('subject'),
             ],
@@ -251,9 +245,11 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
         context = self.get_context(request)
         context['form'] = form
-        context['deja_vote'] = self.get_submission_class().objects.filter(
-            pouvoir=pouvoir, page=self
-        ).exists()
+        context['deja_vote'] = (
+            self.get_submission_class()
+            .objects.filter(pouvoir=pouvoir, page=self)
+            .exists()
+        )
         return render(request, self.get_template(request), context)
 
     def get_form_class(self):
@@ -292,7 +288,8 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             if not votes:
                 # Création
                 votes.bulk_create(
-                    pouvoir.ponderation * [
+                    pouvoir.ponderation
+                    * [
                         votes.model(
                             pouvoir=pouvoir, page=self, form_data=form_data
                         )
@@ -355,7 +352,7 @@ class Pouvoir(models.Model):
         null=True,
         blank=True,
         help_text="Le pouvoir doit au moins désigner un nom, "
-        "un prénom ou un nom de collectif."
+        "un prénom ou un nom de collectif.",
     )
     courriel = models.EmailField()
     contact = models.CharField(
@@ -364,17 +361,17 @@ class Pouvoir(models.Model):
         null=True,
         blank=True,
     )
-    ponderation = models.PositiveSmallIntegerField(
-        "Pondération", default=1,
-    )
+    ponderation = models.PositiveSmallIntegerField("Pondération", default=1,)
 
     panels = [
         FieldPanel('scrutin'),
         FieldPanel('ponderation'),
-        MultiFieldPanel([
+        MultiFieldPanel(
+            [
                 FieldRowPanel([FieldPanel('nom'), FieldPanel('prenom')]),
                 FieldPanel('collectif'),
-            ], "Identité",
+            ],
+            "Identité",
         ),
         FieldPanel('courriel'),
         FieldPanel('contact'),

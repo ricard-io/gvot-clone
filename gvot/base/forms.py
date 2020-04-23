@@ -57,8 +57,8 @@ class ImportForm(forms.Form):
             "« courriel{star}{star} », « contact » et « ponderation ».<br>"
             "Au moins un colonne marquée par « {star} » doit être remplie.<br>"
             "Les colonnes marquée par « {star}{star} » ne peuvent être vides."
-            "<br>Une pondération absente sera interprétée à la valeur « 1 »."
-            .format(star='<span style="color:#cd3238">*</span>')
+            "<br>Une pondération absente sera interprétée à la valeur "
+            "« 1 ».".format(star='<span style="color:#cd3238">*</span>')
         ),
     )
 

@@ -82,9 +82,12 @@ class MaillingSingleConfirm(FormInvalidMixin, PouvoirUUIDMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['pouvoir'] = self.object
         context['scrutin'] = self.object.scrutin
-        context['preview'] = dict(zip(
-            ['subject', 'txt', 'html'], self.object.preview_mail(self.request)
-        ))
+        context['preview'] = dict(
+            zip(
+                ['subject', 'txt', 'html'],
+                self.object.preview_mail(self.request),
+            )
+        )
         return context
 
     def get_error_message(self):
@@ -156,9 +159,12 @@ class MaillingConfirm(FormInvalidMixin, FormView):
             context['dests'] = "tous les participants ayant voté"
         elif self.dests == 'abstenus':
             context['dests'] = "tous les participants n'ayant pas encore voté"
-        context['preview'] = dict(zip(
-            ['subject', 'txt', 'html'], scrutin.preview_mailling(self.request)
-        ))
+        context['preview'] = dict(
+            zip(
+                ['subject', 'txt', 'html'],
+                scrutin.preview_mailling(self.request),
+            )
+        )
         return context
 
     def get_error_message(self):
@@ -240,7 +246,9 @@ class ImportConfirm(FormInvalidMixin, FormView):
             if self.remplace:
                 models.Pouvoir.objects.filter(scrutin_id=self.scrutin).delete()
 
-            models.Pouvoir.objects.bulk_create([obj for _, obj, _ in ok + warn])
+            models.Pouvoir.objects.bulk_create(
+                [obj for _, obj, _ in ok + warn]
+            )
             messages.success(self.request, "Pouvoirs importés avec succès.")
 
             # drop now obsolete session data
@@ -301,9 +309,13 @@ class ImportConfirm(FormInvalidMixin, FormView):
 
         for index, obj in enumerate(object_list):
             try:
-                if not any([
-                    getattr(obj, f) for f in self.champs if f != 'ponderation'
-                ]):
+                if not any(
+                    [
+                        getattr(obj, f)
+                        for f in self.champs
+                        if f != 'ponderation'
+                    ]
+                ):
                     continue  # drop empty line
 
                 obj.full_clean()

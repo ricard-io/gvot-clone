@@ -97,7 +97,9 @@ WAGTAIL_APPS = [
 LOCAL_APPS = ['gvot.base']
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + WAGTAIL_APPS + THIRD_PARTY_APPS + LOCAL_APPS  # noqa
+INSTALLED_APPS = (
+    DJANGO_APPS + WAGTAIL_APPS + THIRD_PARTY_APPS + LOCAL_APPS  # noqa
+)
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -235,9 +237,7 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # ADMIN
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/stable/ref/settings/#admins
-ADMINS = getaddresses(
-    [env('ADMINS', default='Cliss XXI <tech@cliss21.org>')]
-)
+ADMINS = getaddresses([env('ADMINS', default='Cliss XXI <tech@cliss21.org>')])
 
 # https://docs.djangoproject.com/en/stable/ref/settings/#managers
 MANAGERS = ADMINS

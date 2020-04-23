@@ -19,7 +19,5 @@ if env.bool('READ_CONFIG_FILE', default=True):
 """The Django settings module's name to use."""
 DJANGO_SETTINGS_MODULE = env(
     'DJANGO_SETTINGS_MODULE',
-    default='gvot.settings.{}'.format(
-        env('ENV', default=DEFAULT_ENVIRONMENT)
-    ),
+    default='gvot.settings.{}'.format(env('ENV', default=DEFAULT_ENVIRONMENT)),
 )
