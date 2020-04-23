@@ -80,7 +80,9 @@ class PouvoirAdmin(ModelAdmin):
         'ponderation',
     )
     list_filter = ('scrutin',)
-    search_fields = ('prenom', 'nom', 'courriel', 'contact')
+    search_fields = [
+        s for s in list_display if s not in ['scrutin', 'ponderation']
+    ]
     index_template_name = 'modeladmin/index_pouvoirs.html'
     button_helper_class = PouvoirButtonHelper
 
