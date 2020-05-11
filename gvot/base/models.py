@@ -310,30 +310,6 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     def get_submission_class(self):
         return Vote
 
-    def preview_mailling(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {
-            'pouvoir': Pouvoir(
-                scrutin=self,
-                nom=request.user.last_name,
-                prenom=request.user.first_name,
-                courriel=request.user.email,
-            )
-        }
-        return emails.preview_templated(
-            request, 'mailling', context, None, [request.user.email]
-        )
-
-    def send_mailling(self, request, qs):
-        # FIXME : bug avec qs.values car empèche le parcours de scrutin :
-        # donc doit ajouter la version dict du scrutin
-        # En l'état peut fuiter des infos via les templates
-        datas = [
-            ({'pouvoir': p}, (p.courriel,))
-            for p in qs.select_related('scrutin')
-        ]
-        emails.send_mass_templated(request, 'mailling', None, datas)
-
     def pondere(self):
         return self.pouvoir_set.exclude(ponderation=1).exists()
 
@@ -403,19 +379,6 @@ class Pouvoir(models.Model):
     def uri(self):
         return reverse('uuid', args=(self.uuid,))
 
-    def preview_mail(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': self}
-        return emails.preview_templated(
-            request, 'mailling', context, None, [self.courriel]
-        )
-
-    def send_mail(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': self}
-        emails.send_templated(
-            request, 'mailling', context, None, [self.courriel]
-
 
 class EmailTemplate(models.Model):
     class Meta:
@@ -427,6 +390,7 @@ class EmailTemplate(models.Model):
     nom = models.CharField(max_length=100)
     sujet = models.CharField(max_length=255)
     texte = models.TextField("Email, version texte")
+    # FIXME: reduce features ; add proper link handler
     html = RichTextField("Email, version HTML", blank=True)
 
     panels = [
@@ -452,3 +416,25 @@ class EmailTemplate(models.Model):
         return emails.preview_templated(
             request, self, context, None, [request.user.email]
         )
+
+    def send_mailling(self, request, qs):
+        # FIXME : bug avec qs.values car empèche le parcours de scrutin :
+        # donc doit ajouter la version dict du scrutin
+        # En l'état peut fuiter des infos via les templates
+        datas = [
+            ({'pouvoir': p}, (p.courriel,))
+            for p in qs.select_related('scrutin')
+        ]
+        emails.send_mass_templated(request, self, None, datas)
+
+    def preview_mail(self, request, pouvoir):
+        # FIXME: en l'état peut fuiter des infos via les templates
+        context = {'pouvoir': pouvoir}
+        return emails.preview_templated(
+            request, self, context, None, [pouvoir.courriel]
+        )
+
+    def send_mail(self, request, pouvoir):
+        # FIXME: en l'état peut fuiter des infos via les templates
+        context = {'pouvoir': pouvoir}
+        emails.send_templated(request, self, context, None, [pouvoir.courriel])

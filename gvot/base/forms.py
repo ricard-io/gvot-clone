@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
-from .models import Scrutin
+from .models import EmailTemplate, Scrutin
 
 
 class MaillingForm(forms.Form):
@@ -18,6 +18,12 @@ class MaillingForm(forms.Form):
         help_text="Les destinataires considérés seront ceux liés à ce scrutin.",
     )
 
+    template = forms.ModelChoiceField(
+        queryset=EmailTemplate.objects,
+        help_text="Le modèle doit être liés à ce scrutin.",
+        empty_label="Sélectionnez un modèle",
+    )
+
     dests = forms.ChoiceField(
         choices=[
             (None, "Sélectionnez les destinataires"),
@@ -25,6 +31,21 @@ class MaillingForm(forms.Form):
             ('exprimes', "Tous les participants ayant voté"),
             ('abstenus', "Tous les participants n'ayant pas encore voté"),
         ],
+    )
+
+    # validation :
+    # - scrutin
+    # - templates
+
+
+class MaillingSingleForm(forms.Form):
+    """
+    Formulaire pour renvoyer les infos d'un pouvoir.
+    """
+
+    # FIXME: filtrer les templates pour exclure les confirmations de vote
+    template = forms.ModelChoiceField(
+        queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",
     )
 
 

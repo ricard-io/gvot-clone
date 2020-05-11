@@ -7,7 +7,7 @@ from wagtail.contrib.modeladmin.options import ModelAdmin, modeladmin_register
 from wagtail.core import hooks
 
 from . import import_urls, mailling_urls, scrutin_urls
-from .models import Pouvoir, EmailTemplate
+from .models import EmailTemplate, Pouvoir
 from .templatetags.minified import minified
 
 
