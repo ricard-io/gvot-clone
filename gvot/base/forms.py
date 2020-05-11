@@ -12,7 +12,6 @@ class MaillingForm(forms.Form):
     Formulaire pour les emaillings.
     """
 
-    # FIXME: hiérarchiser par les scrutins
     # FIXME: filtrer les templates pour exclure les confirmations de vote
     template = forms.ModelChoiceField(
         queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",
@@ -26,6 +25,23 @@ class MaillingForm(forms.Form):
             ('abstenus', "Tous les participants n'ayant pas encore voté"),
         ],
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # We dynamically override the choices to build a grouped select
+        self.fields['template'].choices = [
+            (None, self.fields['template'].empty_label)
+        ] + [
+            (
+                scrutin.title,
+                [
+                    (tpl.id, "{} : {}".format(scrutin, tpl.nom))
+                    for tpl in scrutin.emailtemplate_set.all()
+                ],
+            )
+            for scrutin in Scrutin.objects.live().public()
+        ]
 
 
 class MaillingSingleForm(forms.Form):
