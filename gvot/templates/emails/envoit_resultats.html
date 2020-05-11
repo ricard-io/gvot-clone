@@ -1,0 +1,39 @@
+<p>
+  Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom %} {{ pouvoir.nom }}{% endif %},
+</p>
+<p>
+  Le scrutin intitulé « <strong>{{ pouvoir.scrutin.title }}</strong> » est clos.
+</p>
+{% if pouvoir.collectif %}
+<p>
+  Vous êtiez invité à y participer en tant que {{ pouvoir.collectif }}.
+</p>
+{% endif %}
+<p>
+  Nous tenions à vous apporter les résultats du vote :
+  <hr/>
+  <!-- ---------------------------------------------->
+
+  <br/>
+  <h2>Détailler les résultats ici</h2>
+  <br/>
+
+  <!-- ---------------------------------------------->
+  <hr/>
+</p>
+<p>
+  Merci pour votre participation.
+  <br/>
+  L'équipe organisatrice
+</p>
+<hr/>
+<p>
+  Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.<br/>
+  Pour plus d'informations :
+  <a rel="noreferrer" href="{{ request.base_url }}">
+    {{ request.base_url }}
+  </a>
+</p>
+<p>
+  En cas de difficultés : <a href="mailto:{{ settings.assistance }}">contactez l'assistance</a>.
+</p>

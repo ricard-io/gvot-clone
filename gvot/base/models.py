@@ -6,6 +6,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.http import Http404, HttpResponseGone
 from django.shortcuts import get_object_or_404, render
+from django.template import Engine
 from django.urls import reverse
 from django.urls.converters import UUIDConverter
 from django.utils import timezone
@@ -163,6 +164,18 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
     confirmation = RichTextField(blank=True)
 
+    confirm_tpl = models.ForeignKey(
+        'EmailTemplate',
+        verbose_name='Modèle du courriel de confirmation',
+        on_delete=models.SET_NULL,
+        help_text="Par défaut il en sera fourni un à la création du scrutin. "
+        "Si le champ est laissé vide, aucun courriel de confirmation ne sera "
+        "envoyé.",
+        null=True,
+        blank=True,
+        related_name='+',
+    )
+
     content_panels = AbstractEmailForm.content_panels + [
         FormSubmissionsPanel(),
         MultiFieldPanel(
@@ -192,7 +205,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     ]
 
     promote_panels = Page.promote_panels
-    settings_panels = Page.settings_panels
+    settings_panels = Page.settings_panels + [FieldPanel('confirm_tpl')]
 
     edit_handler = TabbedInterface(
         [
@@ -313,12 +326,29 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     def pondere(self):
         return self.pouvoir_set.exclude(ponderation=1).exists()
 
-    # FIXME: à la création d'un scrutin, lui associer 2 nouveaux templates:
-    # - ouverture du scrutin
-    # - confirmation de vote
-    # - notification d'un tiers
-    # FIXME : ajouter le champ de sélection du template
-    #         de notification et de confirmation
+    def after_creation(self):
+        # Create default scrutins's email templates
+        tpl_engine = Engine.get_default()
+        for base_tpl, nom in [
+            ['confirmation_vote', "Confirmation du vote"],
+            ['scrutin_ouvert', "Ouverture du scrutin"],
+            ['rappel_code', "Rappel des codes"],
+            ['envoit_resultats', "Envoit des résultats"],
+        ]:
+            sujet, texte, html = [
+                tpl_engine.get_template(
+                    "emails/{}.{}".format(base_tpl, suffix)
+                ).source
+                for suffix in ['subject', 'txt', 'html']
+            ]
+            tpl = self.emailtemplate_set.create(
+                nom=nom, sujet=sujet, texte=texte, html=html
+            )
+
+            # Set default confirmation email template
+            if base_tpl == 'confirmation_vote':
+                self.confirm_tpl = tpl
+                self.save()
 
 
 # FIXME: manque de manipulation en masse ? (suppression, compte)
