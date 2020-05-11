@@ -4,6 +4,7 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models import F, Q
 from django.http import Http404, HttpResponseGone
 from django.shortcuts import get_object_or_404, render
 from django.template import Engine
@@ -420,10 +421,23 @@ class Pouvoir(models.Model):
         return reverse('uuid', args=(self.uuid,))
 
 
+class EmailTemplateQuerySet(models.QuerySet):
+    def spammable(self):
+        # exclude confirmation templates
+        return self.all().exclude(
+            Q(id=F('scrutin__confirm_tpl__id')) & ~Q(scrutin__confirm_tpl=None)
+        )
+
+
+EmailTemplateManager = models.Manager.from_queryset(EmailTemplateQuerySet)
+
+
 class EmailTemplate(models.Model):
     class Meta:
         verbose_name = "Modèle de courriel"
         verbose_name_plural = "Modèles de courriels"
+
+    objects = EmailTemplateManager()
 
     # FIXME: ajouter des infos d'aide
     scrutin = models.ForeignKey('Scrutin', on_delete=models.CASCADE)

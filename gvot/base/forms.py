@@ -12,7 +12,6 @@ class MaillingForm(forms.Form):
     Formulaire pour les emaillings.
     """
 
-    # FIXME: filtrer les templates pour exclure les confirmations de vote
     template = forms.ModelChoiceField(
         queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",
     )
@@ -37,7 +36,7 @@ class MaillingForm(forms.Form):
                 scrutin.title,
                 [
                     (tpl.id, "{} : {}".format(scrutin, tpl.nom))
-                    for tpl in scrutin.emailtemplate_set.all()
+                    for tpl in scrutin.emailtemplate_set.spammable()
                 ],
             )
             for scrutin in Scrutin.objects.live().public()
@@ -53,9 +52,8 @@ class MaillingSingleForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields[
             'template'
-        ].queryset = pouvoir.scrutin.emailtemplate_set.all()
+        ].queryset = pouvoir.scrutin.emailtemplate_set.spammable()
 
-    # FIXME: filtrer les templates pour exclure les confirmations de vote
     template = forms.ModelChoiceField(
         queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",
     )

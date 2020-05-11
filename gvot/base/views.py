@@ -88,9 +88,11 @@ class MaillingSingleConfirm(FormInvalidMixin, PouvoirUUIDMixin, FormView):
         self.template_id = self.request.session.get('template_id', None)
 
     def dispatch(self, request, *args, **kwargs):
-        if not models.EmailTemplate.objects.filter(
-            id=self.template_id
-        ).exists():
+        if (
+            not models.EmailTemplate.objects.spammable()
+            .filter(id=self.template_id)
+            .exists()
+        ):
             return redirect(
                 reverse('mailling:single', args=(self.object.uuid,))
             )
@@ -150,9 +152,9 @@ class MaillingConfirm(FormInvalidMixin, FormView):
     def dispatch(self, request, *args, **kwargs):
         if (
             not self.dests
-            or not models.EmailTemplate.objects.filter(
-                id=self.template_id
-            ).exists()
+            or not models.EmailTemplate.objects.spammable()
+            .filter(id=self.template_id)
+            .exists()
         ):
             return redirect(reverse('mailling:index'))
         self.template = models.EmailTemplate.objects.get(id=self.template_id)
