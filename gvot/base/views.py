@@ -201,14 +201,6 @@ class ImportIndex(FormInvalidMixin, FormView):
     success_url = reverse_lazy('import:confirm')
 
     def form_valid(self, form):
-        return self.confirm_csv_import(form)
-
-    def confirm_csv_import(self, form):
-        # drop previous hypothetic session data
-        self.request.session.pop('csv_file', None)
-        self.request.session.pop('scrutin', None)
-        self.request.session.pop('remplace', None)
-
         # parse file
         csv_file = self.request.FILES.get('csv_file', None)
         csv_file.seek(0)  # rewind probably needed
