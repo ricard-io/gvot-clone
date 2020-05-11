@@ -415,4 +415,40 @@ class Pouvoir(models.Model):
         context = {'pouvoir': self}
         emails.send_templated(
             request, 'mailling', context, None, [self.courriel]
+
+
+class EmailTemplate(models.Model):
+    class Meta:
+        verbose_name = "Modèle de courriel"
+        verbose_name_plural = "Modèles de courriels"
+
+    # FIXME: ajouter des infos d'aide
+    scrutin = models.ForeignKey('Scrutin', on_delete=models.CASCADE)
+    nom = models.CharField(max_length=100)
+    sujet = models.CharField(max_length=255)
+    texte = models.TextField("Email, version texte")
+    html = RichTextField("Email, version HTML", blank=True)
+
+    panels = [
+        FieldPanel('scrutin'),
+        FieldPanel('nom'),
+        FieldPanel('sujet'),
+        FieldPanel('texte'),
+        FieldPanel('html'),
+    ]
+
+    def __str__(self):
+        return "{} ({}) - {}".format(self.nom, self.sujet, self.scrutin)
+
+    def preview_mailling(self, request):
+        context = {
+            'pouvoir': Pouvoir(
+                scrutin=self.scrutin,
+                nom=request.user.last_name,
+                prenom=request.user.first_name,
+                courriel=request.user.email,
+            )
+        }
+        return emails.preview_templated(
+            request, self, context, None, [request.user.email]
         )

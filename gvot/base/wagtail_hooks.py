@@ -7,7 +7,7 @@ from wagtail.contrib.modeladmin.options import ModelAdmin, modeladmin_register
 from wagtail.core import hooks
 
 from . import import_urls, mailling_urls, scrutin_urls
-from .models import Pouvoir
+from .models import Pouvoir, EmailTemplate
 from .templatetags.minified import minified
 
 
@@ -90,6 +90,20 @@ class PouvoirAdmin(ModelAdmin):
     ]
     index_template_name = 'modeladmin/index_pouvoirs.html'
     button_helper_class = PouvoirButtonHelper
+
+
+@modeladmin_register
+class EmailTemplateAdmin(ModelAdmin):
+    model = EmailTemplate
+    menu_icon = 'mail'
+    menu_label = "Modèles de courriels"
+    list_display = (
+        'nom',
+        'sujet',
+        'scrutin',
+    )
+    list_filter = ('scrutin',)
+    search_fields = ('nom', 'sujet', 'texte', 'html')
 
 
 @hooks.register('register_admin_urls')
