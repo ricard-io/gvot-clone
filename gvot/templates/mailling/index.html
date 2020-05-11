@@ -11,20 +11,6 @@
 
 {% block form %}
   <ul class="objects">
-    <li class="object required model_choice_field">
-      <div class="title-wrapper">
-        <label for="id_scrutin">
-          Scrutin
-        </label>
-      </div>
-      <div class="object-layout">
-        <div class="object-layout_big-part">
-          <fieldset>
-            {% include "wagtailadmin/shared/field_as_li.html" with field=form.scrutin show_label=False  %}
-          </fieldset>
-        </div>
-      </div>
-    </li>
     <li class="object required file_field">
       <div class="title-wrapper">
         <label for="id_destinataires">

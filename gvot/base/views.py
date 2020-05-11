@@ -124,7 +124,6 @@ class MaillingIndex(FormInvalidMixin, FormView):
 
     def form_valid(self, form):
         # save data in session
-        self.request.session['scrutin'] = form.cleaned_data['scrutin'].id
         self.request.session['dests'] = form.cleaned_data['dests']
         self.request.session['template'] = form.cleaned_data['template'].id
         return super().form_valid(form)
@@ -140,21 +139,19 @@ class MaillingConfirm(FormInvalidMixin, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.scrutin = self.request.session.get('scrutin', None)
         self.dests = self.request.session.get('dests', None)
         self.template = self.request.session.get('template', None)
 
     def dispatch(self, request, *args, **kwargs):
         if (
             not self.dests
-            or not self.scrutin
-            or not models.Scrutin.objects.filter(id=self.scrutin).exists()
             or not models.EmailTemplate.objects.filter(
                 id=self.template
             ).exists()
         ):
             return redirect(reverse('mailling:index'))
-        pouvoirs = models.Pouvoir.objects.filter(scrutin_id=self.scrutin)
+        self.template = models.EmailTemplate.objects.get(id=self.template)
+        pouvoirs = self.template.scrutin.pouvoir_set.all()
         if self.dests == 'tous':
             self.qs = pouvoirs
         elif self.dests == 'exprimes':
@@ -171,7 +168,6 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         messages.success(self.request, "Mailling démarré avec succès.")
 
         # drop now obsolete session data
-        self.request.session.pop('scrutin', False)
         self.request.session.pop('dests', False)
         self.request.session.pop('template', False)
 
@@ -179,9 +175,7 @@ class MaillingConfirm(FormInvalidMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        scrutin = models.Scrutin.objects.get(id=self.scrutin)
-        template = models.EmailTemplate.objects.get(id=self.template)
-        context['scrutin'] = scrutin
+        context['scrutin'] = self.template.scrutin
         context['nb'] = self.qs.count()
         if self.dests == 'tous':
             context['dests'] = "tous les participants"
@@ -192,7 +186,7 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         context['preview'] = dict(
             zip(
                 ['subject', 'txt', 'html'],
-                template.preview_mailling(self.request),
+                self.template.preview_mailling(self.request),
             )
         )
         return context

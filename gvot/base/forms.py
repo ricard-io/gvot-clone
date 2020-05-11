@@ -12,17 +12,10 @@ class MaillingForm(forms.Form):
     Formulaire pour les emaillings.
     """
 
-    scrutin = forms.ModelChoiceField(
-        queryset=Scrutin.objects,
-        empty_label="Sélectionnez un scrutin",
-        help_text="Les destinataires considérés seront ceux liés à ce scrutin.",
-    )
-
+    # FIXME: hiérarchiser par les scrutins
     # FIXME: filtrer les templates pour exclure les confirmations de vote
     template = forms.ModelChoiceField(
-        queryset=EmailTemplate.objects,
-        help_text="Le modèle doit être liés à ce scrutin.",
-        empty_label="Sélectionnez un modèle",
+        queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",
     )
 
     dests = forms.ChoiceField(
@@ -33,10 +26,6 @@ class MaillingForm(forms.Form):
             ('abstenus', "Tous les participants n'ayant pas encore voté"),
         ],
     )
-
-    # FIXME: validation :
-    # - scrutin
-    # - templates
 
 
 class MaillingSingleForm(forms.Form):
