@@ -363,7 +363,10 @@ class Pouvoir(models.Model):
     def __str__(self):
         if self.collectif:
             return "{} ({})".format(self.collectif, self.uuid)
-        return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
+        if self.nom and self.prenom:
+            return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
+        if self.nom or self.prenom:
+            return "{} ({})".format(self.prenom or self.nom, self.uuid)
 
     def save(self, *args, **kwargs):
         self.clean()
