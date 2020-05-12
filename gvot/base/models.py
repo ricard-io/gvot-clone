@@ -312,6 +312,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             else:
                 # Mise à jour
                 votes.update(form_data=form_data, submit_time=timezone.now())
+            # FIXME: gérer template dynamique conditionnel
             pouvoir.notify_vote(request)
 
         elif not self.vote_set.exists():
@@ -444,7 +445,7 @@ class EmailTemplate(models.Model):
     nom = models.CharField(max_length=100)
     sujet = models.CharField(max_length=255)
     texte = models.TextField("Email, version texte")
-    # FIXME: reduce features ; add proper link handler
+    # FIXME: reduce features ; add template link handler / hack
     html = RichTextField("Email, version HTML", blank=True)
 
     panels = [

@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 
 
 def prepare_templated(request, template, context, insert_head=False):
+    # FIXME: intégrer autoescape, et utiliser richtext
     def render_subject():
         subject = Template(template.sujet).render(Context(context))
         # Email subject *must not* contain newlines
