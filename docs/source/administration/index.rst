@@ -93,6 +93,9 @@ Le questionnaire du scrutin est paramétrable dans l'onglet « Questionnaire �
 Des détails techniques restent paramétrables dans les onglets « Promotion » et
 « Paramètres ».
 
+Une fois le scrutin créé, des modèles de courriels sont créés et assignés
+au scrutin. Il est possible de les gérer dans le panel « Modèles de courriels ».
+
 Ajout des pouvoirs
 ^^^^^^^^^^^^^^^^^^
 
@@ -132,11 +135,48 @@ prévisualisation de l'importation vous sera également présentée.
 C'est seulement après avoir validé la prévisualisation que l'import sera
 effectué.
 
+Modèles de courriels
+^^^^^^^^^^^^^^^^^^^^
+
+Vous pouvez personnaliser vos modèles d'emails et en définir de nouveaux via
+le panel « Modèles de courriels ». Un modèle doit avoir un nom, être lié à un
+scrutin, et posséder un sujet et un contenu texte. Il est aussi possible
+d'associer un contenu HTML qui sera présenté au format `multipart/alternative 
+<https://fr.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#alternative>`_.
+
+Les différents champs qui composent le courriel peuvent tirer parti du moteur
+de gabarit de django. Sa documentation est accessible ici : 
+`<https://docs.djangoproject.com/fr/3.0/ref/templates/language/>`_
+
+FIXME: retreindre à une liste fermée de variables.
+Le contexte des gabarits est chargé avec les variables suivantes :
+- pouvoir
+- request
+- settings
+
+**GvoT** réserve pour chaque scrutin un modèle de courriel servant à la
+confirmation des votes auprès des participants. Ce modèle est éditable et peut
+être configuré dans l'onglet « Paramètres » du scrutin. Il est possible
+également de le supprimer ou le déconfigurer pour que les participants ne
+recoivent pas de confirmation.
+
+Expédition d'un courriel
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Vous pouvez envoyer un courriel à un participant, directement depuis le panel
+« Pouvoirs ».
+
+Une fois les modalités d'envois définies, une confirmation avec
+prévisualisation du mailling vous sera présentée.
+
+C'est seulement après avoir validé la prévisualisation que l'expédition sera
+programmée.
+
 Expédition d'un mailling
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Vous pouvez démarrer un mailling pour expédier les pouvoirs, directement depuis
-le panel « Pouvoirs ».
+Vous pouvez démarrer un mailling d'annonce, directement depuis le panel
+« Pouvoirs ».
 
 Une fois les modalités d'envois définies, une confirmation avec
 prévisualisation du mailling vous sera présentée.
