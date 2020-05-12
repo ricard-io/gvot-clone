@@ -33,6 +33,12 @@ class MaillingSingleForm(forms.Form):
     Formulaire pour renvoyer les infos d'un pouvoir.
     """
 
+    def __init__(self, *args, pouvoir=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields[
+            'template'
+        ].queryset = pouvoir.scrutin.emailtemplate_set.all()
+
     # FIXME: filtrer les templates pour exclure les confirmations de vote
     template = forms.ModelChoiceField(
         queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",

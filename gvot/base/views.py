@@ -61,6 +61,11 @@ class MaillingSingle(FormInvalidMixin, PouvoirUUIDMixin, FormView):
     form_class = forms.MaillingSingleForm
     template_name = 'mailling/single.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['pouvoir'] = self.object
+        return kwargs
+
     def get_success_url(self):
         return reverse('mailling:single_confirm', args=(self.object.uuid,))
 
