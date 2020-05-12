@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
             name='EmailTemplate',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nom', models.CharField(max_length=100)),
-                ('sujet', models.CharField(max_length=255)),
-                ('texte', models.TextField(verbose_name='Email, version texte')),
-                ('html', wagtail.core.fields.RichTextField(blank=True, verbose_name='Email, version HTML')),
-                ('scrutin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Scrutin')),
+                ('nom', models.CharField(help_text='Utilisé uniquement comme repère interne.', max_length=100)),
+                ('sujet', models.CharField(help_text='Le sujet du courriel. Peut inclure du balisage de gabarit Django. Voir la documentation.', max_length=255, verbose_name='sujet du courriel')),
+                ('texte', models.TextField(help_text='Peut inclure du balisage de gabarit Django. Voir la documentation.', verbose_name='contenu du courriel, version texte')),
+                ('html', wagtail.core.fields.RichTextField(blank=True, help_text='Peut inclure du balisage de gabarit Django. Voir la documentation.', verbose_name='contenu du courriel, version HTML')),
+                ('scrutin', models.ForeignKey(help_text='Le scrutin concerné par ce modèle de courriel.', on_delete=django.db.models.deletion.CASCADE, to='base.Scrutin')),
             ],
             options={
                 'verbose_name': 'Modèle de courriel',

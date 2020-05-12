@@ -440,20 +440,40 @@ class EmailTemplate(models.Model):
 
     objects = EmailTemplateManager()
 
-    # FIXME: ajouter des infos d'aide
-    scrutin = models.ForeignKey('Scrutin', on_delete=models.CASCADE)
-    nom = models.CharField(max_length=100)
-    sujet = models.CharField(max_length=255)
-    texte = models.TextField("Email, version texte")
+    scrutin = models.ForeignKey(
+        'Scrutin',
+        on_delete=models.CASCADE,
+        help_text="Le scrutin concerné par ce modèle de courriel.",
+    )
+    nom = models.CharField(
+        max_length=100, help_text="Utilisé uniquement comme repère interne."
+    )
+    sujet = models.CharField(
+        "sujet du courriel",
+        max_length=255,
+        help_text="Le sujet du courriel. "
+        "Peut inclure du balisage de gabarit Django. Voir la documentation.",
+    )
+    texte = models.TextField(
+        "contenu du courriel, version texte",
+        help_text="Peut inclure du balisage de gabarit Django."
+        " Voir la documentation.",
+    )
     # FIXME: reduce features ; add template link handler / hack
-    html = RichTextField("Email, version HTML", blank=True)
+    html = RichTextField(
+        "contenu du courriel, version HTML",
+        help_text="Peut inclure du balisage de gabarit Django. "
+        "Voir la documentation.",
+        blank=True,
+    )
 
     panels = [
         FieldPanel('scrutin'),
         FieldPanel('nom'),
-        FieldPanel('sujet'),
-        FieldPanel('texte'),
-        FieldPanel('html'),
+        MultiFieldPanel(
+            [FieldPanel('sujet'), FieldPanel('texte'), FieldPanel('html')],
+            "Détails du courriel",
+        ),
     ]
 
     def __str__(self):
