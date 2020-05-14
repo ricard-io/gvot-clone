@@ -6,7 +6,7 @@ from wagtail.contrib.modeladmin.helpers import ButtonHelper
 from wagtail.contrib.modeladmin.options import ModelAdmin, modeladmin_register
 from wagtail.core import hooks
 
-from . import import_urls, mailling_urls, scrutin_urls
+from . import import_urls, mailing_urls, scrutin_urls
 from .models import EmailTemplate, Pouvoir
 from .templatetags.minified import minified
 
@@ -30,13 +30,13 @@ class PouvoirButtonHelper(ButtonHelper):
             'title': 'Importer des %s' % self.verbose_name_plural,
         }
 
-    def mailling_button(self):
+    def mailing_button(self):
         classnames = ['bicolor', 'icon', 'icon-mail']
         cn = self.finalise_classname(classnames)
         return {
-            'url': reverse('mailling:index'),
-            'title': 'Démarrer un mailling',
-            'label': 'Démarrer un mailling',
+            'url': reverse('mailing:index'),
+            'title': 'Démarrer un mailing',
+            'label': 'Démarrer un mailing',
             'classname': cn,
         }
 
@@ -50,7 +50,7 @@ class PouvoirButtonHelper(ButtonHelper):
         ]
         cn = self.finalise_classname(classnames)
         return {
-            'url': reverse('mailling:single', args=(pk,)),
+            'url': reverse('mailing:single', args=(pk,)),
             'title': 'Envoyer un email',
             'label': 'Envoyer un email',
             'classname': cn,
@@ -110,9 +110,7 @@ class EmailTemplateAdmin(ModelAdmin):
 def register_admin_urls():
     return [
         path('import-pouvoir/', include(import_urls, namespace='import')),
-        path(
-            'mailling-pouvoir/', include(mailling_urls, namespace='mailling')
-        ),
+        path('mailing-pouvoir/', include(mailing_urls, namespace='mailing')),
         path('scrutin/', include(scrutin_urls, namespace='scrutin')),
     ]
 

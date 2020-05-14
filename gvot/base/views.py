@@ -59,7 +59,7 @@ class FormInvalidMixin:
 
 class MaillingSingle(FormInvalidMixin, PouvoirUUIDMixin, FormView):
     form_class = forms.MaillingSingleForm
-    template_name = 'mailling/single.html'
+    template_name = 'mailing/single.html'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -67,7 +67,7 @@ class MaillingSingle(FormInvalidMixin, PouvoirUUIDMixin, FormView):
         return kwargs
 
     def get_success_url(self):
-        return reverse('mailling:single_confirm', args=(self.object.uuid,))
+        return reverse('mailing:single_confirm', args=(self.object.uuid,))
 
     def form_valid(self, form):
         # save data in session
@@ -75,12 +75,12 @@ class MaillingSingle(FormInvalidMixin, PouvoirUUIDMixin, FormView):
         return super().form_valid(form)
 
     def get_error_message(self):
-        return "Le mailling n'a pas été poursuivi du fait d'erreurs."
+        return "Le mailing n'a pas été poursuivi du fait d'erreurs."
 
 
 class MaillingSingleConfirm(FormInvalidMixin, PouvoirUUIDMixin, FormView):
     form_class = forms.forms.Form
-    template_name = 'mailling/single_confirm.html'
+    template_name = 'mailing/single_confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
 
     def setup(self, request, *args, **kwargs):
@@ -94,7 +94,7 @@ class MaillingSingleConfirm(FormInvalidMixin, PouvoirUUIDMixin, FormView):
             .exists()
         ):
             return redirect(
-                reverse('mailling:single', args=(self.object.uuid,))
+                reverse('mailing:single', args=(self.object.uuid,))
             )
         self.template = models.EmailTemplate.objects.get(id=self.template_id)
         return super().dispatch(request, *args, **kwargs)
@@ -126,8 +126,8 @@ class MaillingSingleConfirm(FormInvalidMixin, PouvoirUUIDMixin, FormView):
 
 class MaillingIndex(FormInvalidMixin, FormView):
     form_class = forms.MaillingForm
-    template_name = 'mailling/index.html'
-    success_url = reverse_lazy('mailling:confirm')
+    template_name = 'mailing/index.html'
+    success_url = reverse_lazy('mailing:confirm')
 
     def form_valid(self, form):
         # save data in session
@@ -136,12 +136,12 @@ class MaillingIndex(FormInvalidMixin, FormView):
         return super().form_valid(form)
 
     def get_error_message(self):
-        return "Le mailling n'a pas été poursuivi du fait d'erreurs."
+        return "Le mailing n'a pas été poursuivi du fait d'erreurs."
 
 
 class MaillingConfirm(FormInvalidMixin, FormView):
     form_class = forms.forms.Form
-    template_name = 'mailling/confirm.html'
+    template_name = 'mailing/confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
 
     def setup(self, request, *args, **kwargs):
@@ -156,7 +156,7 @@ class MaillingConfirm(FormInvalidMixin, FormView):
             .filter(id=self.template_id)
             .exists()
         ):
-            return redirect(reverse('mailling:index'))
+            return redirect(reverse('mailing:index'))
         self.template = models.EmailTemplate.objects.get(id=self.template_id)
         pouvoirs = self.template.scrutin.pouvoir_set.all()
         if self.dests == 'tous':
@@ -170,7 +170,7 @@ class MaillingConfirm(FormInvalidMixin, FormView):
 
     def form_valid(self, form):
 
-        self.template.send_mailling(self.request, self.qs)
+        self.template.send_mailing(self.request, self.qs)
         messages.success(self.request, "Mailling démarré avec succès.")
 
         # drop now obsolete session data
@@ -192,7 +192,7 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         context['preview'] = dict(
             zip(
                 ['subject', 'txt', 'html'],
-                self.template.preview_mailling(self.request),
+                self.template.preview_mailing(self.request),
             )
         )
         return context

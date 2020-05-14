@@ -9,7 +9,7 @@ from .models import EmailTemplate, Scrutin
 
 class MaillingForm(forms.Form):
     """
-    Formulaire pour les emaillings.
+    Formulaire pour les emailings.
     """
 
     template = forms.ModelChoiceField(

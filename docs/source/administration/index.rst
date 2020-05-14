@@ -167,19 +167,19 @@ Vous pouvez envoyer un courriel à un participant, directement depuis le panel
 « Pouvoirs ».
 
 Une fois les modalités d'envoi définies, une confirmation avec
-prévisualisation du mailling vous sera présentée.
+prévisualisation du mailing vous sera présentée.
 
 C'est seulement après avoir validé la prévisualisation que l'expédition sera
 programmée.
 
-Expédition d'un mailling
-^^^^^^^^^^^^^^^^^^^^^^^^
+Expédition d'un mailing
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Vous pouvez démarrer un mailling d'annonce, directement depuis le panel
+Vous pouvez démarrer un mailing d'annonce, directement depuis le panel
 « Pouvoirs ».
 
 Une fois les modalités d'envoi définies, une confirmation avec
-prévisualisation du mailling vous sera présentée.
+prévisualisation du mailing vous sera présentée.
 
 .. note::
 

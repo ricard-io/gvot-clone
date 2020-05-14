@@ -479,7 +479,7 @@ class EmailTemplate(models.Model):
     def __str__(self):
         return "{} ({}) - {}".format(self.nom, self.sujet, self.scrutin)
 
-    def preview_mailling(self, request):
+    def preview_mailing(self, request):
         context = {
             'pouvoir': Pouvoir(
                 scrutin=self.scrutin,
@@ -492,7 +492,7 @@ class EmailTemplate(models.Model):
             request, self, context, None, [request.user.email]
         )
 
-    def send_mailling(self, request, qs):
+    def send_mailing(self, request, qs):
         # FIXME : bug avec qs.values car empèche le parcours de scrutin :
         # donc doit ajouter la version dict du scrutin
         # En l'état peut fuiter des infos via les templates
