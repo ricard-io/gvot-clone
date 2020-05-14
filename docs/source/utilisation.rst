@@ -36,8 +36,8 @@ Voter
 Pour voter il suffit d'accéder au scrutin et de répondre au questionnaire.
 Selon le questionnaire, les réponses peuvent être contraintes. Il vous faudra
 donc veiller à bien valider le formulaire, sans quoi il vous sera représenté
-pour correction. Si vous ne poursuiviez pas cette étape, votre vote ne saurait
-être pris en compte.
+pour correction. Si vous ne poursuiviez pas cette étape, votre vote ne sera
+pas pris en compte.
 
 Une fois votre vote enregistré une page de confirmation vous sera présenté et
 un courriel de confirmation vous sera expédié.
@@ -48,8 +48,8 @@ Corriger son vote
 Pour contrôler et corriger son vote il suffit d'accéder au scrutin et de lire
 et/ou re-répondre au questionnaire.
 
-Une fois votre éventuelle modification enregistrée, une page de confirmation
-vous sera présenté et un courriel de confirmation vous sera expédié.
+Une fois votre modification enregistrée, une page de confirmation vous sera
+présentée et un courriel de confirmation vous sera expédié.
 
 Transférer son vote
 ===================

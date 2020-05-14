@@ -2,16 +2,16 @@ Présentation
 ************
 
 **GvoT** est une application Web visant à permettre le vote en ligne à
-large échelle dans les organisation.
+large échelle dans les organisations.
 
 **GvoT** est né d’un besoin pendant la crise du COVID19 : permettre
 l'organisation de votes d'assemblées générales en ligne pour les collectifs
 démocratiques d'envergure régionale voire nationale.
 
-**GvoT** est né d’une coopération entre acteurs qui ont convergé quant
+**GvoT** est né d’une coopération entre acteur⋅ices qui ont convergé quant
 aux besoins de leurs membres et qui ont décidé d’investir du temps pour que cet
 outil aboutisse au-delà de leurs propres besoins et qu’il serve, d’une manière
-plus générale, les associations en France.
+plus générale toutes les associations.
 
 
 Fonctionnalités
@@ -44,14 +44,14 @@ Ne sont pas encore implantés dans le logiciel :
 Pourquoi **GvoT** ?
 ===================
 
-Habituellement, les rencontres physiques sont des moments privilégiées de la
-vie associative et peu d'organisations ont recours au vote en ligne. Seule
-éventuellement des grosses organisations d'envergures nationales y recourent
+Habituellement, les rencontres physiques sont des moments privilégiés de la
+vie associative et peu d'organisations ont recours au vote en ligne. Seules
+éventuellement des organisations d'envergure nationale y recourent
 pour augmenter leur participation et atteindre un quorum.
 
-Néanmoins la crise du COVID19 fait émerger le besoin de valider en urgence
+Néanmoins la crise du COVID19 a fait émerger le besoin de valider en urgence
 et à distance des décisions d'assemblées, pour faire face par exemple à des
-obligations statutaires ou des contraintes budgétaires.
+obligations statutaires ou à des contraintes budgétaires.
 
 Pour répondre à ce besoin, Cliss XXI a choisi de développer et de mettre à
 disposition un outil dédié : **GvoT**. Cet outil est destiné principalement

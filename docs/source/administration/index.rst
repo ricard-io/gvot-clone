@@ -129,7 +129,7 @@ La colonne « courriel » ne peut être vide.
 Une pondération absente sera interprétée à la valeur « 1 ».
 
 Une fois votre fichier téléversé, les entrées du fichier vont être validées
-unes à unes et les erreurs ou les alertes vous seront rapportées. Une
+unes à unes et les erreurs ou les alertes vous seront signalées. Une
 prévisualisation de l'importation vous sera également présentée.
 
 C'est seulement après avoir validé la prévisualisation que l'import sera
@@ -141,11 +141,11 @@ Modèles de courriels
 Vous pouvez personnaliser vos modèles d'emails et en définir de nouveaux via
 le panel « Modèles de courriels ». Un modèle doit avoir un nom, être lié à un
 scrutin, et posséder un sujet et un contenu texte. Il est aussi possible
-d'associer un contenu HTML qui sera présenté au format `multipart/alternative 
+d'associer un contenu HTML qui sera présenté au format `multipart/alternative
 <https://fr.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#alternative>`_.
 
 Les différents champs qui composent le courriel peuvent tirer parti du moteur
-de gabarit de django. Sa documentation est accessible ici : 
+de gabarit de django. Sa documentation est accessible ici :
 `<https://docs.djangoproject.com/fr/3.0/ref/templates/language/>`_
 
 FIXME: retreindre à une liste fermée de variables.
@@ -166,7 +166,7 @@ Expédition d'un courriel
 Vous pouvez envoyer un courriel à un participant, directement depuis le panel
 « Pouvoirs ».
 
-Une fois les modalités d'envois définies, une confirmation avec
+Une fois les modalités d'envoi définies, une confirmation avec
 prévisualisation du mailling vous sera présentée.
 
 C'est seulement après avoir validé la prévisualisation que l'expédition sera
@@ -178,7 +178,7 @@ Expédition d'un mailling
 Vous pouvez démarrer un mailling d'annonce, directement depuis le panel
 « Pouvoirs ».
 
-Une fois les modalités d'envois définies, une confirmation avec
+Une fois les modalités d'envoi définies, une confirmation avec
 prévisualisation du mailling vous sera présentée.
 
 .. note::
