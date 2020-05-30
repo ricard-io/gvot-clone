@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import get_connection
 from django.core.mail.message import EmailMultiAlternatives
 from django.template import Context, Template
@@ -28,7 +27,6 @@ def prepare_templated(request, template, context, insert_head=False):
 
     context.update(
         {
-            'site': get_current_site(request),
             'settings': {'assistance': settings.ASSISTANCE},
             'request': {
                 'base_url': "{}://{}".format(
