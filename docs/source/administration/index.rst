@@ -148,11 +148,46 @@ Les différents champs qui composent le courriel peuvent tirer parti du moteur
 de gabarit de django. Sa documentation est accessible ici :
 `<https://docs.djangoproject.com/fr/3.0/ref/templates/language/>`_
 
-FIXME: retreindre à une liste fermée de variables.
-Le contexte des gabarits est chargé avec les variables suivantes :
-- pouvoir
-- request
-- settings
+Le contexte des gabarits est notamment chargé avec les variables suivantes :
+
+::
+
+   ├── pouvoir
+   │   ├── uuid
+   │   ├── collectif
+   │   ├── contact
+   │   ├── courriel
+   │   ├── nom
+   │   ├── ponderation
+   │   ├── prenom
+   │   ├── uri FIXME
+   │   └── scrutin FIXME
+   │       ├── id
+   │       ├── action
+   │       ├── confirmation
+   │       ├── first_published_at
+   │       ├── from_address
+   │       ├── go_live_at
+   │       ├── introduction
+   │       ├── last_published_at
+   │       ├── latest_revision_created_at
+   │       ├── live
+   │       ├── ouvert
+   │       ├── path
+   │       ├── pondere FIXME
+   │       ├── peremption
+   │       ├── prescription
+   │       ├── search_description
+   │       ├── seo_title
+   │       ├── slug
+   │       ├── subject
+   │       ├── title
+   │       ├── to_address
+   │       └── url_path
+   ├── request
+   │   └── baseurl
+   └── settings
+       └── assistance
 
 **GvoT** réserve pour chaque scrutin un modèle de courriel servant à la
 confirmation des votes auprès des participants. Ce modèle est éditable et peut
