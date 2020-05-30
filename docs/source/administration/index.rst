@@ -160,8 +160,8 @@ Le contexte des gabarits est notamment chargé avec les variables suivantes :
    │   ├── nom
    │   ├── ponderation
    │   ├── prenom
-   │   ├── uri FIXME
-   │   └── scrutin FIXME
+   │   ├── uri
+   │   └── scrutin
    │       ├── id
    │       ├── action
    │       ├── confirmation
@@ -174,7 +174,7 @@ Le contexte des gabarits est notamment chargé avec les variables suivantes :
    │       ├── live
    │       ├── ouvert
    │       ├── path
-   │       ├── pondere FIXME
+   │       ├── pondere
    │       ├── peremption
    │       ├── prescription
    │       ├── search_description

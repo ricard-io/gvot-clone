@@ -352,6 +352,22 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
                 self.confirm_tpl = tpl
                 self.save()
 
+    def context_values(self):
+        return {
+            **Scrutin.objects.filter(id=self.id).values()[0],
+            'pondere': self.pondere(),
+        }
+
+    def pouvoir_context_values(self, qs):
+        return [
+            {
+                **d,
+                'uri': reverse('uuid', args=(d['uuid'],)),
+                'scrutin': self.context_values(),
+            }
+            for d in qs.values()
+        ]
+
 
 # FIXME: manque de manipulation en masse ? (suppression, compte)
 class Pouvoir(models.Model):
@@ -418,8 +434,9 @@ class Pouvoir(models.Model):
             request, 'notify_vote', context, None, [self.courriel]
         )
 
-    def uri(self):
-        return reverse('uuid', args=(self.uuid,))
+    def context_values(self):
+        qs = self._meta.model.objects.filter(pk=self.pk)
+        return self.scrutin.pouvoir_context_values(qs)[0]
 
 
 class EmailTemplateQuerySet(models.QuerySet):
@@ -481,35 +498,34 @@ class EmailTemplate(models.Model):
 
     def preview_mailing(self, request):
         context = {
-            'pouvoir': Pouvoir(
-                scrutin=self.scrutin,
-                nom=request.user.last_name,
-                prenom=request.user.first_name,
-                courriel=request.user.email,
-            )
+            'pouvoir': {
+                'uuid': uuid.uuid4(),
+                'scrutin': self.scrutin.context_values(),
+                'nom': request.user.last_name,
+                'prenom': request.user.first_name,
+                'courriel': request.user.email,
+                'collectif': None,
+                'contact': None,
+                'ponderation': 1,
+            }
         }
         return emails.preview_templated(
             request, self, context, None, [request.user.email]
         )
 
     def send_mailing(self, request, qs):
-        # FIXME : bug avec qs.values car empèche le parcours de scrutin :
-        # donc doit ajouter la version dict du scrutin
-        # En l'état peut fuiter des infos via les templates
         datas = [
-            ({'pouvoir': p}, (p.courriel,))
-            for p in qs.select_related('scrutin')
+            ({'pouvoir': d}, (d['courriel'],))
+            for d in self.scrutin.pouvoir_context_values(qs)
         ]
         emails.send_mass_templated(request, self, None, datas)
 
     def preview_mail(self, request, pouvoir):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': pouvoir}
+        context = {'pouvoir': pouvoir.context_values()}
         return emails.preview_templated(
             request, self, context, None, [pouvoir.courriel]
         )
 
     def send_mail(self, request, pouvoir):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': pouvoir}
+        context = {'pouvoir': pouvoir.context_values()}
         emails.send_templated(request, self, context, None, [pouvoir.courriel])
