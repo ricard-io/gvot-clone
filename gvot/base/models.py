@@ -312,7 +312,6 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             else:
                 # Mise à jour
                 votes.update(form_data=form_data, submit_time=timezone.now())
-            # FIXME: gérer template dynamique conditionnel
             pouvoir.notify_vote(request)
 
         elif not self.vote_set.exists():
@@ -428,11 +427,8 @@ class Pouvoir(models.Model):
             )
 
     def notify_vote(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': self}
-        emails.send_templated(
-            request, 'notify_vote', context, None, [self.courriel]
-        )
+        if self.scrutin.confirm_tpl:
+            self.scrutin.confirm_tpl.send_mail(request, self)
 
     def context_values(self):
         qs = self._meta.model.objects.filter(pk=self.pk)
