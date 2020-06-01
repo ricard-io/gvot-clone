@@ -472,12 +472,27 @@ class EmailTemplate(models.Model):
         help_text="Peut inclure du balisage de gabarit Django."
         " Voir la documentation.",
     )
-    # FIXME: reduce features ; add template link handler / hack
+    # FIXME: add template link handler / hack
     html = RichTextField(
         "contenu du courriel, version HTML",
         help_text="Peut inclure du balisage de gabarit Django. "
         "Voir la documentation.",
         blank=True,
+        features=[
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'bold',
+            'italic',
+            'ol',
+            'ul',
+            'hr',
+            'link',
+            'document-link',
+        ],
     )
 
     panels = [
