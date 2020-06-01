@@ -34,7 +34,7 @@ from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Page
 from wagtail.search import index
 
-from . import blocks, emails
+from . import blocks, emails, validators
 from .tapeforms import BigLabelTapeformMixin
 
 
@@ -466,11 +466,13 @@ class EmailTemplate(models.Model):
         max_length=255,
         help_text="Le sujet du courriel. "
         "Peut inclure du balisage de gabarit Django. Voir la documentation.",
+        validators=[validators.validate_template],
     )
     texte = models.TextField(
         "contenu du courriel, version texte",
         help_text="Peut inclure du balisage de gabarit Django."
         " Voir la documentation.",
+        validators=[validators.validate_template],
     )
     html = RichTextField(
         "contenu du courriel, version HTML",
@@ -492,6 +494,7 @@ class EmailTemplate(models.Model):
             'link',
             'document-link',
         ],
+        validators=[validators.validate_template],
     )
 
     panels = [
