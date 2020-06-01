@@ -1,1 +1,1 @@
-Vos accès pour le scrutin « {{ pouvoir.scrutin.title | safe }} »
+Vos accès pour le scrutin « {{ pouvoir.scrutin.title }} »

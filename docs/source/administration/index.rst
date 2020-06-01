@@ -144,6 +144,9 @@ scrutin, et posséder un sujet et un contenu texte. Il est aussi possible
 d'associer un contenu HTML qui sera présenté au format `multipart/alternative
 <https://fr.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions#alternative>`_.
 
+Syntaxe des modèles
+-------------------
+
 Les différents champs qui composent le courriel peuvent tirer parti du moteur
 de gabarit de django. Sa documentation est accessible ici :
 `<https://docs.djangoproject.com/fr/3.0/ref/templates/language/>`_
@@ -189,11 +192,22 @@ Le contexte des gabarits est notamment chargé avec les variables suivantes :
    └── settings
        └── assistance
 
+Liens HTML dans les modèles
+---------------------------
+
+Il est possible de créer un lien dont le texte ou la cible sera engendré par
+le moteur de gabarit. Il faut pour cela passer par un « lien externe » et
+renseigner un chemin d'uri relatif commençant par ``/``.
+
+Confirmations de votes
+----------------------
+
 **GvoT** réserve pour chaque scrutin un modèle de courriel servant à la
 confirmation des votes auprès des participants. Ce modèle est éditable et peut
 être configuré dans l'onglet « Paramètres » du scrutin. Il est possible
 également de le supprimer ou le déconfigurer pour que les participants ne
 recoivent pas de confirmation.
+
 
 Expédition d'un courriel
 ^^^^^^^^^^^^^^^^^^^^^^^^

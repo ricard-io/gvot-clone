@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.core.mail import get_connection
 from django.core.mail.message import EmailMultiAlternatives
@@ -5,11 +7,15 @@ from django.template import Context, Template
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
 
+from wagtail.core.templatetags.wagtailcore_tags import richtext
 
-def prepare_templated(request, template, context, insert_head=False):
-    # FIXME: intégrer autoescape, et utiliser richtext
+
+def prepare_templated(request, template, context, embed=False):
+    def autoescape(s):
+        return "{{% autoescape off %}}{}{{% endautoescape %}}".format(s)
+
     def render_subject():
-        subject = Template(template.sujet).render(Context(context))
+        subject = Template(autoescape(template.sujet)).render(Context(context))
         # Email subject *must not* contain newlines
         return ''.join(subject.splitlines())
 
@@ -20,10 +26,19 @@ def prepare_templated(request, template, context, insert_head=False):
             return render_to_string(
                 'emails/habillage.html', {'subject': subject, 'body': body},
             )
-        elif html:
-            return Template(template.html).render(Context(context))
+        elif html and not embed:
+            # relative urls have to be absoluted
+            body = Template(richtext(template.html)).render(Context(context))
+            return re.sub(
+                r'href=(.)/', r'href=\1{{ request.base_url }}/', body
+            )
+        elif html and embed:
+            # embedded preview
+            return Template(richtext(template.html)).render(Context(context))
         else:
-            return Template(template.texte).render(Context(context))
+            return Template(autoescape(template.texte)).render(
+                Context(context)
+            )
 
     context.update(
         {
@@ -39,7 +54,7 @@ def prepare_templated(request, template, context, insert_head=False):
     subject = render_subject()
     message = render_message()
     try:
-        html_message = render_message(html=True, insert_head=insert_head)
+        html_message = render_message(html=True, insert_head=not embed)
     except TemplateDoesNotExist:  # also TemplateSyntaxError
         html_message = None
 
@@ -49,7 +64,9 @@ def prepare_templated(request, template, context, insert_head=False):
 def preview_templated(
     request, template, context, sender, recipients, **kwargs
 ):
-    subject, message, html = prepare_templated(request, template, context)
+    subject, message, html = prepare_templated(
+        request, template, context, embed=True
+    )
     return subject, message, html
 
 
