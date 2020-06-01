@@ -19,13 +19,13 @@
         <h3>Sujet : {{ preview.subject }}</h3>
         {% if preview.html %}
           <div class="col6">
-            <h3>Version texte</h3>
+            <h3 style="background: #e6e6e6; padding: 1em; margin-bottom: 1em;">Version texte</h3>
         {% endif %}
         <pre>{{ preview.txt }}</pre>
         {% if preview.html %}
           </div>
           <div class="col6">
-            <h3>Version HTML</h3>
+            <h3 style="background: #e6e6e6; padding: 1em; margin-bottom: 1em;">Version HTML</h3>
           <div>{{ preview.html | safe }}</div>
           </div>
         {% endif %}
