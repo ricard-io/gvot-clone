@@ -53,7 +53,8 @@ const CONFIG = {
 
   // Paths to JavaScript entries which will be bundled
   JS_ENTRIES: [
-    'assets/js/app.js'
+    'assets/js/app.js',
+    'assets/js/multiselect.js'
   ],
 
   // Paths to Sass files which will be compiled

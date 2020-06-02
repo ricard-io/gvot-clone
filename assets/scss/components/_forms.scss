@@ -7,3 +7,7 @@
   font-size: 90%;
   color: $danger;
 }
+
+.limited-multiselect + .ms-container {
+  width: 100%;
+}
