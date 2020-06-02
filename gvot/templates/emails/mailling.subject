@@ -1,1 +1,0 @@
-Ouverture du scrutin « {{ pouvoir.scrutin.title | safe }} »

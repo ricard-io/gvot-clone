@@ -1,0 +1,23 @@
+Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom %} {{ pouvoir.nom }}{% endif %},
+
+Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est clos.
+{% if pouvoir.collectif %}
+Vous êtiez invité à y participer en tant que {{ pouvoir.collectif }}.
+{% endif %}
+Nous tenions à vous apporter les résultats du vote :
+
+-----------------------------------------------
+
+        Détailler les résultats ici
+
+-----------------------------------------------
+
+Merci pour votre participation.
+L'équipe organisatrice
+
+
+---
+Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.
+Pour plus d'informations : {{ request.base_url }}
+
+En cas de difficultés : {{ settings.assistance }}

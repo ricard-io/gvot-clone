@@ -58,72 +58,107 @@ class FormInvalidMixin:
 
 
 class MaillingSingle(FormInvalidMixin, PouvoirUUIDMixin, FormView):
-    form_class = forms.forms.Form
-    template_name = 'mailling/single.html'
+    form_class = forms.MaillingSingleForm
+    template_name = 'mailing/single.html'
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['pouvoir'] = self.object
+        return kwargs
 
     def get_success_url(self):
-        return reverse('mailling:single_confirm', args=(self.object.uuid,))
+        return reverse('mailing:single_confirm', args=(self.object.uuid,))
+
+    def form_valid(self, form):
+        # save data in session
+        self.request.session['template_id'] = form.cleaned_data['template'].id
+        return super().form_valid(form)
 
     def get_error_message(self):
-        return "Le mailling n'a pas été poursuivi du fait d'erreurs."
+        return "Le mailing n'a pas été poursuivi du fait d'erreurs."
 
 
 class MaillingSingleConfirm(FormInvalidMixin, PouvoirUUIDMixin, FormView):
     form_class = forms.forms.Form
-    template_name = 'mailling/single_confirm.html'
+    template_name = 'mailing/single_confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.template_id = self.request.session.get('template_id', None)
+
+    def dispatch(self, request, *args, **kwargs):
+        if (
+            not models.EmailTemplate.objects.spammable()
+            .filter(id=self.template_id)
+            .exists()
+        ):
+            return redirect(
+                reverse('mailing:single', args=(self.object.uuid,))
+            )
+        self.template = models.EmailTemplate.objects.get(id=self.template_id)
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
-        self.object.send_mail(self.request)
+        self.template.send_mail(self.request, self.object)
         messages.success(self.request, "Mailling démarré avec succès.")
+
+        # drop now obsolete session data
+        self.request.session.pop('template_id', False)
+
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['pouvoir'] = self.object
         context['scrutin'] = self.object.scrutin
-        context['preview'] = dict(zip(
-            ['subject', 'txt', 'html'], self.object.preview_mail(self.request)
-        ))
+        context['preview'] = dict(
+            zip(
+                ['subject', 'txt', 'html'],
+                self.template.preview_mail(self.request, self.object),
+            )
+        )
         return context
 
     def get_error_message(self):
-        return "L'import n'a pas été poursuivi du fait d'erreurs."
+        return "L'envoi n'a pas été poursuivi du fait d'erreurs."
 
 
 class MaillingIndex(FormInvalidMixin, FormView):
     form_class = forms.MaillingForm
-    template_name = 'mailling/index.html'
-    success_url = reverse_lazy('mailling:confirm')
+    template_name = 'mailing/index.html'
+    success_url = reverse_lazy('mailing:confirm')
 
     def form_valid(self, form):
         # save data in session
-        self.request.session['scrutin'] = form.cleaned_data['scrutin'].id
         self.request.session['dests'] = form.cleaned_data['dests']
+        self.request.session['template_id'] = form.cleaned_data['template'].id
         return super().form_valid(form)
 
     def get_error_message(self):
-        return "Le mailling n'a pas été poursuivi du fait d'erreurs."
+        return "Le mailing n'a pas été poursuivi du fait d'erreurs."
 
 
 class MaillingConfirm(FormInvalidMixin, FormView):
     form_class = forms.forms.Form
-    template_name = 'mailling/confirm.html'
+    template_name = 'mailing/confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.scrutin = self.request.session.get('scrutin', None)
         self.dests = self.request.session.get('dests', None)
+        self.template_id = self.request.session.get('template_id', None)
 
     def dispatch(self, request, *args, **kwargs):
         if (
             not self.dests
-            or not self.scrutin
-            or not models.Scrutin.objects.filter(id=self.scrutin).exists()
+            or not models.EmailTemplate.objects.spammable()
+            .filter(id=self.template_id)
+            .exists()
         ):
-            return redirect(reverse('mailling:index'))
-        pouvoirs = models.Pouvoir.objects.filter(scrutin_id=self.scrutin)
+            return redirect(reverse('mailing:index'))
+        self.template = models.EmailTemplate.objects.get(id=self.template_id)
+        pouvoirs = self.template.scrutin.pouvoir_set.all()
         if self.dests == 'tous':
             self.qs = pouvoirs
         elif self.dests == 'exprimes':
@@ -134,21 +169,19 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        models.Scrutin.objects.get(id=self.scrutin).send_mailling(
-            self.request, self.qs
-        )
+
+        self.template.send_mailing(self.request, self.qs)
         messages.success(self.request, "Mailling démarré avec succès.")
 
         # drop now obsolete session data
-        self.request.session.pop('scrutin', False)
         self.request.session.pop('dests', False)
+        self.request.session.pop('template_id', False)
 
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        scrutin = models.Scrutin.objects.get(id=self.scrutin)
-        context['scrutin'] = scrutin
+        context['scrutin'] = self.template.scrutin
         context['nb'] = self.qs.count()
         if self.dests == 'tous':
             context['dests'] = "tous les participants"
@@ -156,13 +189,16 @@ class MaillingConfirm(FormInvalidMixin, FormView):
             context['dests'] = "tous les participants ayant voté"
         elif self.dests == 'abstenus':
             context['dests'] = "tous les participants n'ayant pas encore voté"
-        context['preview'] = dict(zip(
-            ['subject', 'txt', 'html'], scrutin.preview_mailling(self.request)
-        ))
+        context['preview'] = dict(
+            zip(
+                ['subject', 'txt', 'html'],
+                self.template.preview_mailing(self.request),
+            )
+        )
         return context
 
     def get_error_message(self):
-        return "L'import n'a pas été poursuivi du fait d'erreurs."
+        return "L'envoi n'a pas été poursuivi du fait d'erreurs."
 
 
 class ImportIndex(FormInvalidMixin, FormView):
@@ -171,14 +207,6 @@ class ImportIndex(FormInvalidMixin, FormView):
     success_url = reverse_lazy('import:confirm')
 
     def form_valid(self, form):
-        return self.confirm_csv_import(form)
-
-    def confirm_csv_import(self, form):
-        # drop previous hypothetic session data
-        self.request.session.pop('csv_file', None)
-        self.request.session.pop('scrutin', None)
-        self.request.session.pop('remplace', None)
-
         # parse file
         csv_file = self.request.FILES.get('csv_file', None)
         csv_file.seek(0)  # rewind probably needed
@@ -186,7 +214,7 @@ class ImportIndex(FormInvalidMixin, FormView):
 
         # save it in session
         self.request.session['csv_file'] = decoded_file
-        self.request.session['scrutin'] = form.cleaned_data['scrutin'].id
+        self.request.session['scrutin_id'] = form.cleaned_data['scrutin'].id
         self.request.session['remplace'] = form.cleaned_data['remplace']
 
         # call success_url
@@ -218,14 +246,14 @@ class ImportConfirm(FormInvalidMixin, FormView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.csv_file = self.request.session.get('csv_file', None)
-        self.scrutin = self.request.session.get('scrutin', None)
+        self.scrutin_id = self.request.session.get('scrutin_id', None)
         self.remplace = self.request.session.get('remplace', None)
 
     def dispatch(self, request, *args, **kwargs):
         if (
             not self.csv_file
-            or not self.scrutin
-            or not models.Scrutin.objects.filter(id=self.scrutin).exists()
+            or not self.scrutin_id
+            or not models.Scrutin.objects.filter(id=self.scrutin_id).exists()
         ):
             return redirect(reverse('import:index'))
         return super().dispatch(request, *args, **kwargs)
@@ -238,14 +266,18 @@ class ImportConfirm(FormInvalidMixin, FormView):
         ok, warn, ko = self.crible_data()
         if not ko:
             if self.remplace:
-                models.Pouvoir.objects.filter(scrutin_id=self.scrutin).delete()
+                models.Pouvoir.objects.filter(
+                    scrutin_id=self.scrutin_id
+                ).delete()
 
-            models.Pouvoir.objects.bulk_create([obj for _, obj, _ in ok + warn])
+            models.Pouvoir.objects.bulk_create(
+                [obj for _, obj, _ in ok + warn]
+            )
             messages.success(self.request, "Pouvoirs importés avec succès.")
 
             # drop now obsolete session data
             self.request.session.pop('csv_file', False)
-            self.request.session.pop('scrutin', False)
+            self.request.session.pop('scrutin_id', False)
             self.request.session.pop('remplace', False)
 
             # call success_url
@@ -262,7 +294,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
             {
                 k.strip(): v.strip() if isinstance(v, str) else v
                 for k, v in r.items()
-                if k.strip() in self.champs
+                if isinstance(k, str) and k.strip() in self.champs
             }
             for r in reader
         ]
@@ -270,7 +302,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
         # Par défaut on force les ponderation vides à 1
         [d.update({"ponderation": d["ponderation"] or 1}) for d in datas]
 
-        return (models.Pouvoir(scrutin_id=self.scrutin, **d) for d in datas)
+        return (models.Pouvoir(scrutin_id=self.scrutin_id, **d) for d in datas)
 
     def crible_data(self):
         """Crible les lignes entre ce qu'on prend et ce qu'on rejette."""
@@ -281,10 +313,10 @@ class ImportConfirm(FormInvalidMixin, FormView):
         id_fields = ('nom', 'prenom', 'collectif', 'courriel')
 
         courriels_in_db = models.Pouvoir.objects.filter(
-            scrutin_id=self.scrutin
+            scrutin_id=self.scrutin_id
         ).values_list('courriel')
         pouvoirs_in_db = models.Pouvoir.objects.filter(
-            scrutin_id=self.scrutin
+            scrutin_id=self.scrutin_id
         ).values_list(*id_fields)
 
         courriels_in_import = set()
@@ -301,9 +333,13 @@ class ImportConfirm(FormInvalidMixin, FormView):
 
         for index, obj in enumerate(object_list):
             try:
-                if not any([
-                    getattr(obj, f) for f in self.champs if f != 'ponderation'
-                ]):
+                if not any(
+                    [
+                        getattr(obj, f)
+                        for f in self.champs
+                        if f != 'ponderation'
+                    ]
+                ):
                     continue  # drop empty line
 
                 obj.full_clean()

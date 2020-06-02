@@ -4,8 +4,10 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models import F, Q
 from django.http import Http404, HttpResponseGone
 from django.shortcuts import get_object_or_404, render
+from django.template import Engine
 from django.urls import reverse
 from django.urls.converters import UUIDConverter
 from django.utils import timezone
@@ -32,7 +34,7 @@ from wagtail.core.fields import RichTextField, StreamField
 from wagtail.core.models import Page
 from wagtail.search import index
 
-from . import blocks, emails
+from . import blocks, emails, validators
 from .tapeforms import BigLabelTapeformMixin
 
 
@@ -163,6 +165,18 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
     confirmation = RichTextField(blank=True)
 
+    confirm_tpl = models.ForeignKey(
+        'EmailTemplate',
+        verbose_name='Modèle du courriel de confirmation',
+        on_delete=models.SET_NULL,
+        help_text="Par défaut il en sera fourni un à la création du scrutin. "
+        "Si le champ est laissé vide, aucun courriel de confirmation ne sera "
+        "envoyé.",
+        null=True,
+        blank=True,
+        related_name='+',
+    )
+
     content_panels = AbstractEmailForm.content_panels + [
         FormSubmissionsPanel(),
         MultiFieldPanel(
@@ -170,22 +184,16 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
                 FieldPanel('ouvert'),
                 FieldPanel('peremption'),
                 FieldPanel('prescription'),
-            ], "Aspects RGPD",
+            ],
+            "Aspects RGPD",
         ),
         FieldPanel('introduction'),
         FieldPanel('confirmation'),
-        MultiFieldPanel(
-            [
-                FieldPanel('action'),
-            ], "Appel à action"
-        ),
+        MultiFieldPanel([FieldPanel('action')], "Appel à action"),
         MultiFieldPanel(
             [
                 FieldRowPanel(
-                    [
-                        FieldPanel('from_address'),
-                        FieldPanel('to_address'),
-                    ]
+                    [FieldPanel('from_address'), FieldPanel('to_address')]
                 ),
                 FieldPanel('subject'),
             ],
@@ -198,7 +206,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     ]
 
     promote_panels = Page.promote_panels
-    settings_panels = Page.settings_panels
+    settings_panels = Page.settings_panels + [FieldPanel('confirm_tpl')]
 
     edit_handler = TabbedInterface(
         [
@@ -251,9 +259,11 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
         context = self.get_context(request)
         context['form'] = form
-        context['deja_vote'] = self.get_submission_class().objects.filter(
-            pouvoir=pouvoir, page=self
-        ).exists()
+        context['deja_vote'] = (
+            self.get_submission_class()
+            .objects.filter(pouvoir=pouvoir, page=self)
+            .exists()
+        )
         return render(request, self.get_template(request), context)
 
     def get_form_class(self):
@@ -292,7 +302,8 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             if not votes:
                 # Création
                 votes.bulk_create(
-                    pouvoir.ponderation * [
+                    pouvoir.ponderation
+                    * [
                         votes.model(
                             pouvoir=pouvoir, page=self, form_data=form_data
                         )
@@ -313,32 +324,48 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     def get_submission_class(self):
         return Vote
 
-    def preview_mailling(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {
-            'pouvoir': Pouvoir(
-                scrutin=self,
-                nom=request.user.last_name,
-                prenom=request.user.first_name,
-                courriel=request.user.email,
-            )
-        }
-        return emails.preview_templated(
-            request, 'mailling', context, None, [request.user.email]
-        )
-
-    def send_mailling(self, request, qs):
-        # FIXME : bug avec qs.values car empèche le parcours de scrutin :
-        # donc doit ajouter la version dict du scrutin
-        # En l'état peut fuiter des infos via les templates
-        datas = [
-            ({'pouvoir': p}, (p.courriel,))
-            for p in qs.select_related('scrutin')
-        ]
-        emails.send_mass_templated(request, 'mailling', None, datas)
-
     def pondere(self):
         return self.pouvoir_set.exclude(ponderation=1).exists()
+
+    def after_creation(self):
+        # Create default scrutins's email templates
+        tpl_engine = Engine.get_default()
+        for base_tpl, nom in [
+            ['confirmation_vote', "Confirmation du vote"],
+            ['scrutin_ouvert', "Ouverture du scrutin"],
+            ['rappel_code', "Rappel des codes"],
+            ['envoit_resultats', "Envoit des résultats"],
+        ]:
+            sujet, texte, html = [
+                tpl_engine.get_template(
+                    "emails/{}.{}".format(base_tpl, suffix)
+                ).source
+                for suffix in ['subject', 'txt', 'html']
+            ]
+            tpl = self.emailtemplate_set.create(
+                nom=nom, sujet=sujet, texte=texte, html=html
+            )
+
+            # Set default confirmation email template
+            if base_tpl == 'confirmation_vote':
+                self.confirm_tpl = tpl
+                self.save()
+
+    def context_values(self):
+        return {
+            **Scrutin.objects.filter(id=self.id).values()[0],
+            'pondere': self.pondere(),
+        }
+
+    def pouvoir_context_values(self, qs):
+        return [
+            {
+                **d,
+                'uri': reverse('uuid', args=(d['uuid'],)),
+                'scrutin': self.context_values(),
+            }
+            for d in qs.values()
+        ]
 
 
 # FIXME: manque de manipulation en masse ? (suppression, compte)
@@ -355,7 +382,7 @@ class Pouvoir(models.Model):
         null=True,
         blank=True,
         help_text="Le pouvoir doit au moins désigner un nom, "
-        "un prénom ou un nom de collectif."
+        "un prénom ou un nom de collectif.",
     )
     courriel = models.EmailField()
     contact = models.CharField(
@@ -364,17 +391,17 @@ class Pouvoir(models.Model):
         null=True,
         blank=True,
     )
-    ponderation = models.PositiveSmallIntegerField(
-        "Pondération", default=1,
-    )
+    ponderation = models.PositiveSmallIntegerField("Pondération", default=1,)
 
     panels = [
         FieldPanel('scrutin'),
         FieldPanel('ponderation'),
-        MultiFieldPanel([
+        MultiFieldPanel(
+            [
                 FieldRowPanel([FieldPanel('nom'), FieldPanel('prenom')]),
                 FieldPanel('collectif'),
-            ], "Identité",
+            ],
+            "Identité",
         ),
         FieldPanel('courriel'),
         FieldPanel('contact'),
@@ -383,7 +410,10 @@ class Pouvoir(models.Model):
     def __str__(self):
         if self.collectif:
             return "{} ({})".format(self.collectif, self.uuid)
-        return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
+        if self.nom and self.prenom:
+            return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
+        if self.nom or self.prenom:
+            return "{} ({})".format(self.prenom or self.nom, self.uuid)
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -397,25 +427,118 @@ class Pouvoir(models.Model):
             )
 
     def notify_vote(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': self}
-        emails.send_templated(
-            request, 'notify_vote', context, None, [self.courriel]
+        if self.scrutin.confirm_tpl:
+            self.scrutin.confirm_tpl.send_mail(request, self)
+
+    def context_values(self):
+        qs = self._meta.model.objects.filter(pk=self.pk)
+        return self.scrutin.pouvoir_context_values(qs)[0]
+
+
+class EmailTemplateQuerySet(models.QuerySet):
+    def spammable(self):
+        # exclude confirmation templates
+        return self.all().exclude(
+            Q(id=F('scrutin__confirm_tpl__id')) & ~Q(scrutin__confirm_tpl=None)
         )
 
-    def uri(self):
-        return reverse('uuid', args=(self.uuid,))
 
-    def preview_mail(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': self}
+EmailTemplateManager = models.Manager.from_queryset(EmailTemplateQuerySet)
+
+
+class EmailTemplate(models.Model):
+    class Meta:
+        verbose_name = "Modèle de courriel"
+        verbose_name_plural = "Modèles de courriels"
+
+    objects = EmailTemplateManager()
+
+    scrutin = models.ForeignKey(
+        'Scrutin',
+        on_delete=models.CASCADE,
+        help_text="Le scrutin concerné par ce modèle de courriel.",
+    )
+    nom = models.CharField(
+        max_length=100, help_text="Utilisé uniquement comme repère interne."
+    )
+    sujet = models.CharField(
+        "sujet du courriel",
+        max_length=255,
+        help_text="Le sujet du courriel. "
+        "Peut inclure du balisage de gabarit Django. Voir la documentation.",
+        validators=[validators.validate_template],
+    )
+    texte = models.TextField(
+        "contenu du courriel, version texte",
+        help_text="Peut inclure du balisage de gabarit Django."
+        " Voir la documentation.",
+        validators=[validators.validate_template],
+    )
+    html = RichTextField(
+        "contenu du courriel, version HTML",
+        help_text="Peut inclure du balisage de gabarit Django. "
+        "Voir la documentation.",
+        blank=True,
+        features=[
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'bold',
+            'italic',
+            'ol',
+            'ul',
+            'hr',
+            'link',
+            'document-link',
+        ],
+        validators=[validators.validate_template],
+    )
+
+    panels = [
+        FieldPanel('scrutin'),
+        FieldPanel('nom'),
+        MultiFieldPanel(
+            [FieldPanel('sujet'), FieldPanel('texte'), FieldPanel('html')],
+            "Détails du courriel",
+        ),
+    ]
+
+    def __str__(self):
+        return "{} ({}) - {}".format(self.nom, self.sujet, self.scrutin)
+
+    def preview_mailing(self, request):
+        context = {
+            'pouvoir': {
+                'uuid': uuid.uuid4(),
+                'scrutin': self.scrutin.context_values(),
+                'nom': request.user.last_name,
+                'prenom': request.user.first_name,
+                'courriel': request.user.email,
+                'collectif': None,
+                'contact': None,
+                'ponderation': 1,
+            }
+        }
         return emails.preview_templated(
-            request, 'mailling', context, None, [self.courriel]
+            request, self, context, None, [request.user.email]
         )
 
-    def send_mail(self, request):
-        # FIXME: en l'état peut fuiter des infos via les templates
-        context = {'pouvoir': self}
-        emails.send_templated(
-            request, 'mailling', context, None, [self.courriel]
+    def send_mailing(self, request, qs):
+        datas = [
+            ({'pouvoir': d}, (d['courriel'],))
+            for d in self.scrutin.pouvoir_context_values(qs)
+        ]
+        emails.send_mass_templated(request, self, None, datas)
+
+    def preview_mail(self, request, pouvoir):
+        context = {'pouvoir': pouvoir.context_values()}
+        return emails.preview_templated(
+            request, self, context, None, [pouvoir.courriel]
         )
+
+    def send_mail(self, request, pouvoir):
+        context = {'pouvoir': pouvoir.context_values()}
+        emails.send_templated(request, self, context, None, [pouvoir.courriel])

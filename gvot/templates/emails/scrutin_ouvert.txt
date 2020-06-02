@@ -1,7 +1,6 @@
-{% autoescape off %}
 Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom %} {{ pouvoir.nom }}{% endif %},
 
-Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est annoncé.
+Le scrutin intitulé « {{ pouvoir.scrutin.title }} » est ouvert.
 {% if pouvoir.collectif %}
 Vous êtes invité à y participer en tant que {{ pouvoir.collectif }}.
 {% endif %}
@@ -26,4 +25,3 @@ Ce courriel a été envoyé automatiquement ; merci de ne pas y répondre.
 Pour plus d'informations : {{ request.base_url }}
 
 En cas de difficultés : {{ settings.assistance }}
-{% endautoescape %}

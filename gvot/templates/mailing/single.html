@@ -14,13 +14,13 @@
     <li class="object required file_field">
       <div class="title-wrapper">
         <label for="id_destinataires">
-          Message
+          Modèle de courriel
         </label>
       </div>
       <div class="object-layout">
         <div class="object-layout_big-part">
           <fieldset>
-            <p>L'envois en préparation concerne les transmissions des pouvoirs aux participants. Le choix dynamique n'est pas encore implanté.</p>
+            {% include "wagtailadmin/shared/field_as_li.html" with field=form.template show_label=False  %}
           </fieldset>
         </div>
       </div>

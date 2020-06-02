@@ -2,14 +2,14 @@
 [x] skin
 
 [x] email d'annonce
-[ ] email à la carte (de rappel, de confirmation, ...)
+[x] email à la carte (de rappel, de confirmation, ...)
 [ ] se faire renvoyer ses codes à partir de son email
 
 [x] intégrer https://github.com/pinax/django-mailer/ et tester avec 4000 emails
 
 [x] doc
 
-[ ] attraper les bounces avec du VERP
+[ ] attraper les bounces avec du VERP et les présenter dans l'interface
 
 [x] considérer scrutin ouvert ou pas (avec commutateur)
 [x] mettre les questions dans un panel séparé
@@ -26,3 +26,11 @@
 [x] quitter tweak pour tapeforms
 
 [x] prise en compte des personnes morales
+
+[ ] inclure un entête list-unsubscribe
+
+Notes :
+- rejeter les pouvoirs invalides ne permet pas de lire tous les inscrits/mandats
+- manque l'extraction du résultat
+- ce serait pas con de mettre plusieurs courriels
+- pb de delivery à réfléchir ; implanter SMS ?
