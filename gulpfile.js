@@ -38,6 +38,11 @@ const CONFIG = {
       // ForkAwesome
       src: 'node_modules/fork-awesome/fonts/*',
       dest: 'fonts/fork-awesome'
+    },
+    {
+      // MultiSelect
+      src: 'node_modules/multiselect/{js,img,css}/*',
+      dest: ''
     }
   ],
 
