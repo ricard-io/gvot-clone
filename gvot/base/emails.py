@@ -106,7 +106,7 @@ def send_mass_templated(request, template, sender, datas, **kwargs):
         if html:
             email_message.attach_alternative(html, 'text/html')
         email_message.extra_headers['List-Unsubscribe'] = unsubscribe_link(
-            recipients, subject
+            recepts, subject
         )
         mass_messages.append(email_message)
     return connection.send_messages(mass_messages)

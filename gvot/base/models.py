@@ -586,6 +586,7 @@ class EmailTemplate(models.Model):
                 'collectif': None,
                 'contact': None,
                 'ponderation': 1,
+                'uri': reverse('uuid', args=(uuid.uuid4(),)),
             }
         }
         return emails.preview_templated(
