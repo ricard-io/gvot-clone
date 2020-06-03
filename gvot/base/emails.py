@@ -29,10 +29,12 @@ def prepare_templated(request, template, context, embed=False):
             )
         elif html and not embed:
             # relative urls have to be absoluted
-            body = Template(richtext(template.html)).render(Context(context))
-            return re.sub(
-                r'href=(.)/', r'href=\1{{ request.base_url }}/', body
+            html = re.sub(
+                r'href=(.)/',
+                r'href=\1{{ request.base_url }}/',
+                richtext(template.html),
             )
+            return Template(richtext(html)).render(Context(context))
         elif html and embed:
             # embedded preview
             return Template(richtext(template.html)).render(Context(context))
