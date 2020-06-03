@@ -38,6 +38,11 @@ const CONFIG = {
       // ForkAwesome
       src: 'node_modules/fork-awesome/fonts/*',
       dest: 'fonts/fork-awesome'
+    },
+    {
+      // MultiSelect
+      src: 'node_modules/multiselect/{js,img,css}/*',
+      dest: ''
     }
   ],
 
@@ -48,7 +53,8 @@ const CONFIG = {
 
   // Paths to JavaScript entries which will be bundled
   JS_ENTRIES: [
-    'assets/js/app.js'
+    'assets/js/app.js',
+    'assets/js/multiselect.js'
   ],
 
   // Paths to Sass files which will be compiled

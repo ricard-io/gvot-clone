@@ -27,7 +27,7 @@
 
 [x] prise en compte des personnes morales
 
-[ ] inclure un entête list-unsubscribe
+[x] inclure un entête list-unsubscribe
 
 Notes :
 - rejeter les pouvoirs invalides ne permet pas de lire tous les inscrits/mandats

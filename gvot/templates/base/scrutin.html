@@ -1,6 +1,10 @@
 {% extends "./site_page.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
+{% block extra_head %}{{ block.super }}
+  {{ form.media }}
+{% endblock %}
+
 {% block content %}
   <h1>{{ page.title }}</h1>
   {% if not page.ouvert and not page.vote_set.exists %}

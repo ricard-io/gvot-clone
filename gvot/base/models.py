@@ -1,8 +1,10 @@
 import json
 import uuid
 
+from django import forms
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models
 from django.db.models import F, Q
 from django.http import Http404, HttpResponseGone
@@ -23,6 +25,7 @@ from wagtail.admin.edit_handlers import (
     TabbedInterface,
 )
 from wagtail.contrib.forms.edit_handlers import FormSubmissionsPanel
+from wagtail.contrib.forms.forms import FormBuilder
 from wagtail.contrib.forms.models import (
     FORM_FIELD_CHOICES,
     AbstractEmailForm,
@@ -97,7 +100,7 @@ FORM_FIELD_CHOICES = [
     (c[0], 'Choix multiples') if c[0] == 'checkboxes' else c
     for c in FORM_FIELD_CHOICES
     if c[0] not in ['datetime', 'hidden']
-]
+] + [('lim_multiselect', 'Sélection multiple bornée')]
 
 
 class FormField(AbstractFormField):
@@ -111,6 +114,34 @@ class FormField(AbstractFormField):
     field_type = models.CharField(
         verbose_name='field type', max_length=16, choices=FORM_FIELD_CHOICES,
     )
+    min_values = models.PositiveSmallIntegerField(
+        verbose_name='Valeurs min',
+        null=True,
+        blank=True,
+        help_text="Nombre minimal de valeurs à choisir pour le champ de "
+        "sélection multiple bornée",
+    )
+    max_values = models.PositiveSmallIntegerField(
+        verbose_name='Valeurs max',
+        null=True,
+        blank=True,
+        help_text="Nombre maximal de valeurs à choisir pour le champ de "
+        "sélection multiple bornée",
+    )
+    panels = [
+        FieldPanel('label'),
+        FieldPanel('help_text'),
+        FieldPanel('field_type', classname="formbuilder-type"),
+        FieldPanel('choices', classname="formbuilder-choices"),
+        FieldPanel('default_value', classname="formbuilder-default"),
+        FieldRowPanel(
+            [
+                FieldPanel('required'),
+                FieldPanel('min_values'),
+                FieldPanel('max_values'),
+            ]
+        ),
+    ]
 
 
 class Vote(AbstractFormSubmission):
@@ -119,6 +150,39 @@ class Vote(AbstractFormSubmission):
 
 class ClosedScrutin(Exception):
     pass
+
+
+class LimitedSelectMultiple(forms.SelectMultiple):
+    class Media:
+        css = {'all': ('css/multi-select.css',)}
+        js = ('js/multiselect.js', 'js/jquery.multi-select.js')
+
+    def __init__(self, min_values, max_values, attrs={}, choices=()):
+        attrs.update(
+            {
+                'class': 'limited-multiselect',
+                'data-min': min_values,
+                'data-max': max_values,
+            }
+        )
+        super().__init__(attrs=attrs, choices=choices)
+
+
+class MyFormBuilder(FormBuilder):
+    def create_lim_multiselect_field(self, field, options):
+        options['choices'] = map(
+            lambda x: (x.strip(), x.strip()), field.choices.split(',')
+        )
+        validators = []
+        if field.min_values:
+            validators.append(MinLengthValidator(field.min_values))
+        if field.max_values:
+            validators.append(MaxLengthValidator(field.max_values))
+        return forms.MultipleChoiceField(
+            **options,
+            validators=validators,
+            widget=LimitedSelectMultiple(field.min_values, field.max_values)
+        )
 
 
 # TODO: afficher ouverture du scrutin dans la liste des scrutins
@@ -265,6 +329,8 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             .exists()
         )
         return render(request, self.get_template(request), context)
+
+    form_builder = MyFormBuilder
 
     def get_form_class(self):
         # Dynamically inherit Tapeform properties
