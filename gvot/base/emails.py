@@ -3,6 +3,7 @@ import re
 from django.conf import settings
 from django.core.mail import get_connection
 from django.core.mail.message import EmailMultiAlternatives
+from django.utils.http import urlencode
 from django.template import Context, Template
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
@@ -28,10 +29,12 @@ def prepare_templated(request, template, context, embed=False):
             )
         elif html and not embed:
             # relative urls have to be absoluted
-            body = Template(richtext(template.html)).render(Context(context))
-            return re.sub(
-                r'href=(.)/', r'href=\1{{ request.base_url }}/', body
+            html = re.sub(
+                r'href=(.)/',
+                r'href=\1{{ request.base_url }}/',
+                richtext(template.html),
             )
+            return Template(richtext(html)).render(Context(context))
         elif html and embed:
             # embedded preview
             return Template(richtext(template.html)).render(Context(context))
@@ -70,6 +73,15 @@ def preview_templated(
     return subject, message, html
 
 
+def unsubscribe_link(recipients, subject):
+    return '<mailto:{}?{}>'.format(
+        settings.ASSISTANCE,
+        urlencode(
+            {'subject': 'unsubscribe {} from {}'.format(recipients, [subject])}
+        ),
+    )
+
+
 def send_templated(request, template, context, sender, recipients, **kwargs):
     subject, message, html = prepare_templated(request, template, context)
     email_message = EmailMultiAlternatives(
@@ -77,10 +89,8 @@ def send_templated(request, template, context, sender, recipients, **kwargs):
     )
     if html:
         email_message.attach_alternative(html, 'text/html')
-    email_message.extra_headers[
-        'List-Unsubscribe'
-    ] = '<mailto:{}?subject=unsubscribe {} from {}>'.format(
-        settings.ASSISTANCE, recipients, [subject]
+    email_message.extra_headers['List-Unsubscribe'] = unsubscribe_link(
+        recipients, subject
     )
     email_message.send()
 
@@ -95,10 +105,8 @@ def send_mass_templated(request, template, sender, datas, **kwargs):
         )
         if html:
             email_message.attach_alternative(html, 'text/html')
-        email_message.extra_headers[
-            'List-Unsubscribe'
-        ] = '<mailto:{}?subject=unsubscribe {} from {}>'.format(
-            settings.ASSISTANCE, recipients, [subject]
+        email_message.extra_headers['List-Unsubscribe'] = unsubscribe_link(
+            recipients, subject
         )
         mass_messages.append(email_message)
     return connection.send_messages(mass_messages)
