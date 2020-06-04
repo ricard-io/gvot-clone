@@ -73,12 +73,10 @@ def preview_templated(
     return subject, message, html
 
 
-def unsubscribe_link(recipients, subject):
+def unsubscribe_link(recipients):
     return '<mailto:{}?{}>'.format(
         settings.ASSISTANCE,
-        urlencode(
-            {'subject': 'unsubscribe {} from {}'.format(recipients, [subject])}
-        ),
+        urlencode({'subject': 'unsubscribe {}'.format(recipients)}),
     )
 
 
@@ -90,7 +88,7 @@ def send_templated(request, template, context, sender, recipients, **kwargs):
     if html:
         email_message.attach_alternative(html, 'text/html')
     email_message.extra_headers['List-Unsubscribe'] = unsubscribe_link(
-        recipients, subject
+        recipients
     )
     email_message.send()
 
@@ -106,7 +104,7 @@ def send_mass_templated(request, template, sender, datas, **kwargs):
         if html:
             email_message.attach_alternative(html, 'text/html')
         email_message.extra_headers['List-Unsubscribe'] = unsubscribe_link(
-            recepts, subject
+            recepts
         )
         mass_messages.append(email_message)
     return connection.send_messages(mass_messages)
