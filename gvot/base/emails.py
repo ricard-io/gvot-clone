@@ -3,10 +3,10 @@ import re
 from django.conf import settings
 from django.core.mail import get_connection
 from django.core.mail.message import EmailMultiAlternatives
-from django.utils.http import urlencode
 from django.template import Context, Template
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import render_to_string
+from django.utils.http import urlencode
 
 from wagtail.core.templatetags.wagtailcore_tags import richtext
 
