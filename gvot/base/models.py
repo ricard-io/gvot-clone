@@ -111,6 +111,9 @@ class FormField(AbstractFormField):
     page = ParentalKey(
         'Scrutin', on_delete=models.CASCADE, related_name='form_fields'
     )
+    help_text = RichTextField(
+        verbose_name="texte d'aide", blank=True, features=['bold', 'italic'],
+    )
     field_type = models.CharField(
         verbose_name='field type', max_length=16, choices=FORM_FIELD_CHOICES,
     )
