@@ -38,6 +38,7 @@ from wagtail.core.models import Page
 from wagtail.search import index
 
 from . import blocks, emails, validators
+from .edit_handlers import ResultsPanel
 from .tapeforms import BigLabelTapeformMixin
 
 
@@ -274,6 +275,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
     promote_panels = Page.promote_panels
     settings_panels = Page.settings_panels + [FieldPanel('confirm_tpl')]
+    results_panels = [ResultsPanel()]
 
     edit_handler = TabbedInterface(
         [
@@ -283,6 +285,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             ObjectList(
                 settings_panels, heading="Paramètres", classname='settings'
             ),
+            ObjectList(results_panels, heading="Résultats"),
         ]
     )
 
@@ -435,6 +438,42 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             }
             for d in qs.values()
         ]
+
+    def results_distribution(self):
+        votes = self.vote_set.all()
+
+        compound_fields = self.get_data_fields()[1:]
+        fields = [x[0] for x in compound_fields]
+        headers = [x[1] for x in compound_fields]
+
+        if not votes.exists():
+            return {}
+        m = [[json.loads(v.form_data)[f] for f in fields] for v in votes]
+
+        # m as matrix. We transpose and transtype it to process
+        results_grid = [
+            [
+                tuple(m[j][i]) if isinstance(m[j][i], list) else (m[j][i],)
+                for j in range(len(m))
+            ]
+            for i in range(len(m[0]))
+        ]
+
+        # we flatten content
+        flattened_results_grid = [
+            [item for sublist in t for item in sublist] for t in results_grid
+        ]
+
+        distribution = [
+            sorted(
+                [(elem, line.count(elem)) for elem in set(line)],
+                key=lambda x: x[1],
+                reverse=True,
+            )
+            for line in flattened_results_grid
+        ]
+
+        return dict(zip(headers, distribution))
 
 
 # FIXME: manque de manipulation en masse ? (suppression, compte)
