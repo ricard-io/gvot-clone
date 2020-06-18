@@ -9,7 +9,9 @@
 
 [x] doc
 
+[ ] gérer plusieurs emails pour un pouvoir ; avec une priorité
 [ ] attraper les bounces avec du VERP et les présenter dans l'interface
+[ ] faire un fallback sur les emails restants
 
 [x] considérer scrutin ouvert ou pas (avec commutateur)
 [x] mettre les questions dans un panel séparé
