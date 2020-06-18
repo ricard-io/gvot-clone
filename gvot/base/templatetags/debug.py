@@ -1,11 +1,11 @@
 from django import template
 
-import ipdb
-
 register = template.Library()
 
 
 @register.filter
 def pdb(value):
+    import ipdb
+
     ipdb.set_trace()
     return value
