@@ -38,7 +38,7 @@ from wagtail.core.models import Page
 from wagtail.search import index
 
 from . import blocks, emails, validators
-from .edit_handlers import ResultsPanel
+from .edit_handlers import AttendeesPanel, ResultsPanel
 from .tapeforms import BigLabelTapeformMixin
 
 
@@ -276,6 +276,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     promote_panels = Page.promote_panels
     settings_panels = Page.settings_panels + [FieldPanel('confirm_tpl')]
     results_panels = [ResultsPanel()]
+    attendees_panels = [AttendeesPanel()]
 
     edit_handler = TabbedInterface(
         [
@@ -285,6 +286,7 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             ObjectList(
                 settings_panels, heading="Paramètres", classname='settings'
             ),
+            ObjectList(attendees_panels, heading="Émargements"),
             ObjectList(results_panels, heading="Résultats"),
         ]
     )

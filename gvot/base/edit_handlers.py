@@ -28,3 +28,26 @@ class ResultsPanel(EditHandler):
                 },
             )
         )
+
+
+class AttendeesPanel(EditHandler):
+    template = "modeladmin/attendees.html"
+
+    def render(self):
+        from .models import Pouvoir
+
+        emargement = Pouvoir.objects.filter(
+            vote__page=self.instance
+        ).distinct()
+        participation = emargement.count()
+        expression = self.instance.vote_set.all().count()
+        return mark_safe(
+            render_to_string(
+                self.template,
+                {
+                    'expression': expression,
+                    'participation': participation,
+                    'emargement': emargement.values(),
+                },
+            )
+        )

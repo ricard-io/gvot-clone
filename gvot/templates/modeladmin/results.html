@@ -9,15 +9,16 @@
     <h3>
       Résultats
     </h3>
-      <ul>
-        {% for field, field_results in results.items %}
-          <li style="padding-left: 2em;">
-            {{ field }}<br>
-            <ul>
-              {% for choice, count in field_results %}
-                <li style="padding-left: 2em;">{{ choice }} : {{ count }}</li>
-              {% endfor %}
-            </ul>
-          </li>
-          {% endfor %}
-      </ul>
+    <ul>
+      {% for field, field_results in results.items %}
+        <li style="padding-left: 2em;">
+          {{ field }}<br>
+          <ul>
+            {% for choice, count in field_results %}
+              <li style="padding-left: 2em;">{{ choice }} : {{ count }}</li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

@@ -1,0 +1,32 @@
+{% load static %}
+<div class="overflow">
+    <h3>
+      Participation : {{ participation }} pouvoir{{ participation | pluralize }}
+    </h3>
+    <h3>
+      Expression : {{ expression }} pouvoir{{ expression | pluralize }} pondéré{{ expression | pluralize }}
+    </h3>
+    <h3>
+      Émargement
+    </h3>
+    <table class="listing">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>Collectif</th>
+          <th>Pondération</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pouvoir in emargement %}
+          <tr>
+            <td>{{ pouvoir.prenom }}</td>
+            <td>{{ pouvoir.nom }}</td>
+            <td>{{ pouvoir.collectif}}</td>
+            <td>{{ pouvoir.ponderation }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+</div>
