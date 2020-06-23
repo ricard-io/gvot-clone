@@ -9,7 +9,9 @@
 
 [x] doc
 
+[ ] gérer plusieurs emails pour un pouvoir ; avec une priorité
 [ ] attraper les bounces avec du VERP et les présenter dans l'interface
+[ ] faire un fallback sur les emails restants
 
 [x] considérer scrutin ouvert ou pas (avec commutateur)
 [x] mettre les questions dans un panel séparé
@@ -29,8 +31,10 @@
 
 [x] inclure un entête list-unsubscribe
 
+[x] présenter les résultats
+[x] présenter les émargements
+
 Notes :
 - rejeter les pouvoirs invalides ne permet pas de lire tous les inscrits/mandats
-- manque l'extraction du résultat
 - ce serait pas con de mettre plusieurs courriels
 - pb de delivery à réfléchir ; implanter SMS ?

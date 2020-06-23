@@ -103,9 +103,15 @@ Un pouvoir est un droit de vote, pondéré, associé à un scrutin. Pour des
 raisons d'organisation on y adjoint les noms, prénom (ou bien nom du collectif,
 le cas échéant) et moyens de contact des participants.
 
-Dans le cas d'un pouvoir destiné à un collectif,
-
 Vous pouvez ajouter un pouvoir directement depuis le panel « Pouvoirs ».
+
+.. note::
+
+   La `pondération` défini le nombre de « bulletins » dont le votant dispose.
+   Une personne votant une seule fois avec une pondération de 3
+   engendrera 3 bulletins au dépouillement. Une personne votant avec une
+   pondération à zéro n'engendre aucun bulletin au dépouillement (utile pour
+   les démonstrations).
 
 Importation des pouvoirs
 ^^^^^^^^^^^^^^^^^^^^^^^^
