@@ -113,10 +113,14 @@ class FormField(AbstractFormField):
         'Scrutin', on_delete=models.CASCADE, related_name='form_fields'
     )
     help_text = RichTextField(
-        verbose_name="texte d'aide", blank=True, features=['bold', 'italic'],
+        verbose_name="texte d'aide",
+        blank=True,
+        features=['bold', 'italic'],
     )
     field_type = models.CharField(
-        verbose_name='field type', max_length=16, choices=FORM_FIELD_CHOICES,
+        verbose_name='field type',
+        max_length=16,
+        choices=FORM_FIELD_CHOICES,
     )
     min_values = models.PositiveSmallIntegerField(
         verbose_name='Valeurs min',
@@ -228,7 +232,8 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
     )
     introduction = RichTextField(blank=True)
     action = models.TextField(
-        default="Envoyer", help_text="Texte du bouton du formulaire.",
+        default="Envoyer",
+        help_text="Texte du bouton du formulaire.",
     )
 
     confirmation = RichTextField(blank=True)
@@ -450,7 +455,10 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
         if not votes.exists():
             return {}
-        m = [[json.loads(v.form_data)[f] for f in fields] for v in votes]
+        m = [
+            [json.loads(v.form_data).get(f, "Invalide") for f in fields]
+            for v in votes
+        ]
 
         # m as matrix. We transpose and transtype it to process
         results_grid = [
@@ -501,7 +509,10 @@ class Pouvoir(models.Model):
         null=True,
         blank=True,
     )
-    ponderation = models.PositiveSmallIntegerField("Pondération", default=1,)
+    ponderation = models.PositiveSmallIntegerField(
+        "Pondération",
+        default=1,
+    )
 
     panels = [
         FieldPanel('scrutin'),

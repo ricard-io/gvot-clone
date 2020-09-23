@@ -7584,6 +7584,9 @@ h5,
 h6 {
   margin-top: 1rem; }
 
+.lead b {
+  font-weight: 800; }
+
 .main.container {
   min-height: calc(100vh - 96px - 56px);
   padding-top: 1rem;

@@ -149,14 +149,14 @@ cov: test ### vérifie la couverture de code
 lint: ### vérifie la syntaxe et le code python
 	@$(PYTHON) -m flake8 gvot \
 	  || echo "\033[31m[flake8]\033[0m Veuillez corriger les erreurs ci-dessus."
-	@$(PYTHON) -m isort --check --recursive gvot \
+	@$(PYTHON) -m isort --check gvot \
 	  || echo "\033[31m[isort]\033[0m Veuillez corriger l'ordre des imports avec : make fix-lint"
 ifdef USE_BLACK
 	@$(PYTHON) -m black --check gvot
 endif
 
 fix-lint: ### corrige la syntaxe et ordonne les imports python
-	$(PYTHON) -m isort --recursive gvot
+	$(PYTHON) -m isort gvot
 ifdef USE_BLACK
 	$(PYTHON) -m black gvot
 endif

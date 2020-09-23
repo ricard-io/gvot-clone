@@ -25,7 +25,8 @@ def prepare_templated(request, template, context, embed=False):
             subject = render_subject()
             body = render_message(html=True, insert_head=False)
             return render_to_string(
-                'emails/habillage.html', {'subject': subject, 'body': body},
+                'emails/habillage.html',
+                {'subject': subject, 'body': body},
             )
         elif html and not embed:
             # relative urls have to be absoluted
