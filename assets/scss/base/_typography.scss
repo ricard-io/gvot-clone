@@ -16,3 +16,8 @@ h5,
 h6 {
   margin-top: $spacer;
 }
+
+// bootstrap's bold is broken in .lead
+.lead b {
+  font-weight: 800;
+}
