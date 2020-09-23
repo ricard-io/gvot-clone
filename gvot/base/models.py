@@ -450,7 +450,10 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
 
         if not votes.exists():
             return {}
-        m = [[json.loads(v.form_data)[f] for f in fields] for v in votes]
+        m = [
+            [json.loads(v.form_data).get(f, "Invalide") for f in fields]
+            for v in votes
+        ]
 
         # m as matrix. We transpose and transtype it to process
         results_grid = [
