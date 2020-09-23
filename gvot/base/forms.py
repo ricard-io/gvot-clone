@@ -13,7 +13,8 @@ class MaillingForm(forms.Form):
     """
 
     template = forms.ModelChoiceField(
-        queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",
+        queryset=EmailTemplate.objects,
+        empty_label="Sélectionnez un modèle",
     )
 
     dests = forms.ChoiceField(
@@ -55,7 +56,8 @@ class MaillingSingleForm(forms.Form):
         ].queryset = pouvoir.scrutin.emailtemplate_set.spammable()
 
     template = forms.ModelChoiceField(
-        queryset=EmailTemplate.objects, empty_label="Sélectionnez un modèle",
+        queryset=EmailTemplate.objects,
+        empty_label="Sélectionnez un modèle",
     )
 
 

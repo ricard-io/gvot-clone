@@ -369,7 +369,8 @@ class ImportConfirm(FormInvalidMixin, FormView):
         ok, warn, ko = self.crible_data()
         if ok and not warn and not ko:
             messages.success(
-                self.request, "L'import est valide et peut être poursuivi.",
+                self.request,
+                "L'import est valide et peut être poursuivi.",
             )
         elif warn and not ko:
             messages.warning(
