@@ -261,6 +261,9 @@ WAGTAIL_GRAVATAR_PROVIDER_URL = None
 # Disable update checking on the dashboard
 WAGTAIL_ENABLE_UPDATE_CHECK = False
 
+# Allow html in forms help texts
+WAGTAILFORMS_HELP_TEXT_ALLOW_HTML = True
+
 # ------------------------------------------------------------------------------
 # APPLICATION AND 3RD PARTY LIBRARY SETTINGS
 # ------------------------------------------------------------------------------
