@@ -299,8 +299,9 @@ class ImportConfirm(FormInvalidMixin, FormView):
             for r in reader
         ]
 
-        # Par défaut on force les ponderation vides à 1
-        [d.update({"ponderation": d["ponderation"] or 1}) for d in datas]
+        # Par défaut on force les ponderation vides ou inexistantes à 1
+        for data in datas:
+            data.update({'ponderation': data.get('ponderation', 1) or 1})
 
         return (models.Pouvoir(scrutin_id=self.scrutin_id, **d) for d in datas)
 
