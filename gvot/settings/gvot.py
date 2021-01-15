@@ -22,6 +22,9 @@ WAGTAILEMBEDS_FINDERS = [
     {'class': 'wagtailembedpeertube.finders'},
 ]
 
+# Since wagtail 2.7.4
+WAGTAILFORMS_HELP_TEXT_ALLOW_HTML = True
+
 # MISC
 # ------------------------------------------------------------------------------
 ASSISTANCE = env('ASSISTANCE', default='assistance@localhost')
