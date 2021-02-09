@@ -105,6 +105,9 @@ le cas échéant) et moyens de contact des participants.
 
 Vous pouvez ajouter un pouvoir directement depuis le panel « Pouvoirs ».
 
+Il est possible pour chaque pouvoir de définir des champs personnalisés.
+Ces champs sont exposés dans les modèles de courriel.
+
 .. note::
 
    La `pondération` défini le nombre de « bulletins » dont le votant dispose.
@@ -141,6 +144,13 @@ prévisualisation de l'importation vous sera également présentée.
 C'est seulement après avoir validé la prévisualisation que l'import sera
 effectué.
 
+
+Champs personnalisés
+--------------------
+
+Si des colonnes supplémentaires existent dans le CSV à importer, celles-ci
+définissent des champs personnalisés dans les pouvoirs.
+
 Modèles de courriels
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -162,15 +172,19 @@ Le contexte des gabarits est notamment chargé avec les variables suivantes :
 ::
 
    ├── pouvoir
-   │   ├── uuid
-   │   ├── collectif
-   │   ├── contact
-   │   ├── courriel
-   │   ├── nom
-   │   ├── ponderation
-   │   ├── prenom
-   │   ├── uri
-   │   └── scrutin
+   │   ├── uuid
+   │   ├── collectif
+   │   ├── contact
+   │   ├── courriel
+   │   ├── nom
+   │   ├── ponderation
+   │   ├── prenom
+   │   ├── uri
+   │   ├── champ_perso_1
+   │   ├── champ_perso_2
+   │   ├── champ_perso_3
+   │   ├── ...
+   │   └── scrutin
    │       ├── id
    │       ├── action
    │       ├── confirmation
@@ -194,9 +208,22 @@ Le contexte des gabarits est notamment chargé avec les variables suivantes :
    │       ├── to_address
    │       └── url_path
    ├── request
-   │   └── baseurl
+   │   └── baseurl
    └── settings
-       └── assistance
+       └── assistance
+
+Champs personnalisés
+--------------------
+
+Les champs personnalisés sont nommés à partir de l'intitulé. Celui-ci est
+transformé en minuscule, avec uniquement des caractères alphanumériques, et
+les mots sont séparés par des « _ ».
+
+Par exemple :
+
+- « Téléphone » deviendra « ``téléphone`` » ;
+- « Téléphone mobile » deviendra « ``téléphone_mobile`` » ;
+- « Téléphone mobile + fixe » deviendra « ``téléphone_mobile_fixe`` ».
 
 Liens HTML dans les modèles
 ---------------------------
