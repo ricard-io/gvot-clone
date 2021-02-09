@@ -291,19 +291,38 @@ class ImportConfirm(FormInvalidMixin, FormView):
         reader = csv.DictReader(self.csv_file)
 
         datas = [
-            {
-                k.strip(): v.strip() if isinstance(v, str) else v
-                for k, v in r.items()
-                if isinstance(k, str) and k.strip() in self.champs
-            }
+            (
+                {
+                    k.strip(): v.strip() if isinstance(v, str) else v
+                    for k, v in r.items()
+                    if isinstance(k, str) and k.strip() in self.champs
+                },
+                [
+                    (k.strip(), v.strip() if isinstance(v, str) else v)
+                    for k, v in r.items()
+                    if isinstance(k, str) and k.strip() not in self.champs
+                ],
+            )
             for r in reader
         ]
 
         # Par défaut on force les ponderation vides ou inexistantes à 1
-        for data in datas:
+        for data, _ in datas:
             data.update({'ponderation': data.get('ponderation', 1) or 1})
 
-        return (models.Pouvoir(scrutin_id=self.scrutin_id, **d) for d in datas)
+        return (
+            models.Pouvoir(
+                scrutin_id=self.scrutin_id,
+                **model_data,
+                champ_perso=[
+                    models.ChampPersonnalise(
+                        intitule=intitule, contenu=contenu
+                    )
+                    for intitule, contenu in other_data
+                ]
+            )
+            for model_data, other_data in datas
+        )
 
     def crible_data(self):
         """Crible les lignes entre ce qu'on prend et ce qu'on rejette."""

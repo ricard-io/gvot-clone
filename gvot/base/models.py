@@ -1,5 +1,6 @@
 import json
 import uuid
+from itertools import groupby
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -13,6 +14,7 @@ from django.template import Engine
 from django.urls import reverse
 from django.urls.converters import UUIDConverter
 from django.utils import timezone
+from django.utils.text import slugify
 
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
@@ -437,9 +439,34 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             'pondere': self.pondere(),
         }
 
+    def extract_champs_persos(self, champs_persos, pouvoir_uuid):
+        if pouvoir_uuid in champs_persos:
+            return dict(
+                [
+                    (slugify(k, allow_unicode=True).replace('-', '_'), v)
+                    for _, k, v in champs_persos[pouvoir_uuid]
+                ]
+            )
+        else:
+            return {}
+
     def pouvoir_context_values(self, qs):
+        champs_persos = {
+            uuid: list(champs)
+            for uuid, champs in groupby(
+                qs.values_list(
+                    'champ_perso__pouvoir_id',
+                    'champ_perso__intitule',
+                    'champ_perso__contenu',
+                )
+                .order_by('uuid')
+                .distinct(),
+                key=lambda x: x[0],
+            )
+        }
         return [
             {
+                **self.extract_champs_persos(champs_persos, d['uuid']),
                 **d,
                 'uri': reverse('uuid', args=(d['uuid'],)),
                 'scrutin': self.context_values(),
