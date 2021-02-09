@@ -15,6 +15,7 @@ from django.urls.converters import UUIDConverter
 from django.utils import timezone
 
 from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
 from wagtail.admin.edit_handlers import (
     FieldPanel,
     FieldRowPanel,
@@ -486,8 +487,16 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         return dict(zip(headers, distribution))
 
 
+class ChampPersonnalise(models.Model):
+    pouvoir = ParentalKey('Pouvoir', related_name='champ_perso')
+    intitule = models.CharField(
+        max_length=50, help_text="Exemples : téléphone, surnom..."
+    )
+    contenu = models.CharField(max_length=255)
+
+
 # FIXME: manque de manipulation en masse ? (suppression, compte)
-class Pouvoir(models.Model):
+class Pouvoir(ClusterableModel):
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
@@ -526,6 +535,23 @@ class Pouvoir(models.Model):
         ),
         FieldPanel('courriel'),
         FieldPanel('contact'),
+        MultiFieldPanel(
+            [
+                InlinePanel(
+                    'champ_perso',
+                    label="Champ personnalisé",
+                    panels=[
+                        FieldRowPanel(
+                            [
+                                FieldPanel('intitule'),
+                                FieldPanel('contenu'),
+                            ]
+                        )
+                    ],
+                ),
+            ],
+            "Champs personnalisés",
+        ),
     ]
 
     def __str__(self):
