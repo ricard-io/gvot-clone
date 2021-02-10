@@ -444,7 +444,8 @@ class ImportConfirm(FormInvalidMixin, FormView):
             context['import_warn'],
             context['import_ko'],
         ) = self.dry_run()
-        context['import_fields'] = ['ligne'] + self.champs_models
+        context['basic_fields'] = ['ligne'] + self.champs_models
+        context['extended_fields'] = self.champs_persos
         context['model'] = models.Pouvoir
         return context
 

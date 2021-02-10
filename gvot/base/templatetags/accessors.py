@@ -15,6 +15,13 @@ def _getattr(obj, key):
     return getattr(obj, key)
 
 
+@register.filter
+def get_champ_perso(obj, key):
+    """Extrait un champs perso dans les templates."""
+    champ_perso = obj.champ_perso.filter(intitule=key).first()
+    return champ_perso.contenu if champ_perso else None
+
+
 @register.filter(name="get")
 def _get(obj, key):
     """Equivalent d'un get dans les templates."""
