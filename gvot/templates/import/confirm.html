@@ -16,7 +16,7 @@
       <table class="listing">
         <thead>
           <tr>
-            {% for field in import_fields %}
+            {% for field in basic_fields %}
               {% if forloop.first %}
                 <th id="{{ field }}" class="ordered ascending">
                   {{ field | title }}
@@ -27,12 +27,17 @@
                 </th>
               {% endif %}
             {% endfor %}
+            {% for field in extended_fields %}
+              <th id="{{ field | slugify }}">
+                {{ field | title }}
+              </th>
+            {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for index, pouvoir, exception in import_ko %}
             <tr>
-              {% for field in import_fields %}
+              {% for field in basic_fields %}
                 <td>
                   {% if forloop.first %}
                     {{ index | add:2 }}
@@ -57,6 +62,11 @@
                   {% endif %}
                 </td>
               {% endfor %}
+              {% for field in extended_fields %}
+                <td>
+                  {{ pouvoir | get_champ_perso:field | default_if_none:'-' | truncatechars:100 }}
+                </td>
+              {% endfor %}
             </tr>
           {% endfor %}
         </tbody>
@@ -70,7 +80,7 @@
       <table class="listing">
         <thead>
           <tr>
-            {% for field in import_fields %}
+            {% for field in basic_fields %}
               {% if forloop.first %}
                 <th id="{{ field }}" class="ordered ascending">
                   {{ field | title }}
@@ -84,12 +94,17 @@
                 </th>
               {% endif %}
             {% endfor %}
+            {% for field in extended_fields %}
+              <th id="{{ field | slugify }}">
+                {{ field | title }}
+              </th>
+            {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for index, pouvoir, warning in import_warn %}
             <tr>
-              {% for field in import_fields %}
+              {% for field in basic_fields %}
                 <td>
                   {% if forloop.first %}
                     {{ index | add:2 }}
@@ -101,6 +116,11 @@
                   {% else %}
                     {{ pouvoir | getattr:field | default_if_none:'-' | truncatechars:100 }}
                   {% endif %}
+                </td>
+              {% endfor %}
+              {% for field in extended_fields %}
+                <td>
+                  {{ pouvoir | get_champ_perso:field | default_if_none:'-' | truncatechars:100 }}
                 </td>
               {% endfor %}
             </tr>
@@ -116,7 +136,7 @@
       <table class="listing">
         <thead>
           <tr>
-            {% for field in import_fields %}
+            {% for field in basic_fields %}
               {% if forloop.first %}
                 <th id="{{ field }}" class="ordered ascending">
                   {{ field | title }}
@@ -127,18 +147,28 @@
                 </th>
               {% endif %}
             {% endfor %}
+            {% for field in extended_fields %}
+              <th id="{{ field | slugify }}">
+                {{ field | title }}
+              </th>
+            {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for index, pouvoir, _ in import_ok %}
             <tr>
-              {% for field in import_fields %}
+              {% for field in basic_fields %}
                 <td>
                   {% if forloop.first %}
                     {{ index | add:2 }}
                   {% else %}
                     {{ pouvoir | getattr:field | default_if_none:'-' }}
                   {% endif %}
+                </td>
+              {% endfor %}
+              {% for field in extended_fields %}
+                <td>
+                  {{ pouvoir | get_champ_perso:field | default_if_none:'-' | truncatechars:100 }}
                 </td>
               {% endfor %}
             </tr>

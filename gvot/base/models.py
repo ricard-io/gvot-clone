@@ -1,5 +1,6 @@
 import json
 import uuid
+from itertools import groupby
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -13,8 +14,10 @@ from django.template import Engine
 from django.urls import reverse
 from django.urls.converters import UUIDConverter
 from django.utils import timezone
+from django.utils.text import slugify
 
 from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
 from wagtail.admin.edit_handlers import (
     FieldPanel,
     FieldRowPanel,
@@ -436,9 +439,34 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
             'pondere': self.pondere(),
         }
 
+    def extract_champs_persos(self, champs_persos, pouvoir_uuid):
+        if pouvoir_uuid in champs_persos:
+            return dict(
+                [
+                    (slugify(k, allow_unicode=True).replace('-', '_'), v)
+                    for _, k, v in champs_persos[pouvoir_uuid]
+                ]
+            )
+        else:
+            return {}
+
     def pouvoir_context_values(self, qs):
+        champs_persos = {
+            uuid: list(champs)
+            for uuid, champs in groupby(
+                qs.values_list(
+                    'champ_perso__pouvoir_id',
+                    'champ_perso__intitule',
+                    'champ_perso__contenu',
+                )
+                .order_by('uuid')
+                .distinct(),
+                key=lambda x: x[0],
+            )
+        }
         return [
             {
+                **self.extract_champs_persos(champs_persos, d['uuid']),
                 **d,
                 'uri': reverse('uuid', args=(d['uuid'],)),
                 'scrutin': self.context_values(),
@@ -486,8 +514,16 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         return dict(zip(headers, distribution))
 
 
+class ChampPersonnalise(models.Model):
+    pouvoir = ParentalKey('Pouvoir', related_name='champ_perso')
+    intitule = models.CharField(
+        max_length=50, help_text="Exemples : téléphone, surnom..."
+    )
+    contenu = models.CharField(max_length=255)
+
+
 # FIXME: manque de manipulation en masse ? (suppression, compte)
-class Pouvoir(models.Model):
+class Pouvoir(ClusterableModel):
     uuid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
@@ -526,6 +562,23 @@ class Pouvoir(models.Model):
         ),
         FieldPanel('courriel'),
         FieldPanel('contact'),
+        MultiFieldPanel(
+            [
+                InlinePanel(
+                    'champ_perso',
+                    label="Champ personnalisé",
+                    panels=[
+                        FieldRowPanel(
+                            [
+                                FieldPanel('intitule'),
+                                FieldPanel('contenu'),
+                            ]
+                        )
+                    ],
+                ),
+            ],
+            "Champs personnalisés",
+        ),
     ]
 
     def __str__(self):
