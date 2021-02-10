@@ -1,5 +1,6 @@
 import csv
 
+from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, RedirectView, detail
@@ -234,7 +235,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
     template_name = 'import/confirm.html'
     success_url = reverse_lazy('base_pouvoir_modeladmin_index')
 
-    champs = [
+    champs_models = [
         'nom',
         'prenom',
         'collectif',
@@ -242,6 +243,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
         'contact',
         'ponderation',
     ]
+    champs_persos = []
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -259,7 +261,18 @@ class ImportConfirm(FormInvalidMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        return self.commit_csv_import(form)
+        try:
+            return self.commit_csv_import(form)
+        except Exception as e:
+            if settings.DEBUG:
+                raise e
+            else:
+                messages.error(
+                    self.request,
+                    "Impossible d'importer les pouvoirs. Une anomalie est "
+                    "survenue : {}".format(e),
+                )
+                return super().form_invalid(form)
 
     def commit_csv_import(self, form):
         """Tout va bien, on importe."""
@@ -270,9 +283,18 @@ class ImportConfirm(FormInvalidMixin, FormView):
                     scrutin_id=self.scrutin_id
                 ).delete()
 
-            models.Pouvoir.objects.bulk_create(
+            created = models.Pouvoir.objects.bulk_create(
                 [obj for _, obj, _ in ok + warn]
             )
+            if self.champs_persos:
+                models.ChampPersonnalise.objects.bulk_create(
+                    [
+                        champ_perso
+                        for pouvoir in created
+                        for champ_perso in pouvoir.champ_perso.all()
+                    ]
+                )
+
             messages.success(self.request, "Pouvoirs importés avec succès.")
 
             # drop now obsolete session data
@@ -289,18 +311,23 @@ class ImportConfirm(FormInvalidMixin, FormView):
         """Réifie les données en objets Python et les soumet à validation."""
 
         reader = csv.DictReader(self.csv_file)
+        self.champs_persos = [
+            f for f in reader.fieldnames if f not in self.champs_models
+        ]
 
         datas = [
             (
                 {
                     k.strip(): v.strip() if isinstance(v, str) else v
                     for k, v in r.items()
-                    if isinstance(k, str) and k.strip() in self.champs
+                    if isinstance(k, str) and k.strip() in self.champs_models
                 },
                 [
                     (k.strip(), v.strip() if isinstance(v, str) else v)
                     for k, v in r.items()
-                    if isinstance(k, str) and k.strip() not in self.champs
+                    if isinstance(k, str)
+                    and k.strip() not in self.champs_models
+                    and v
                 ],
             )
             for r in reader
@@ -356,7 +383,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
                 if not any(
                     [
                         getattr(obj, f)
-                        for f in self.champs
+                        for f in self.champs_models
                         if f != 'ponderation'
                     ]
                 ):
@@ -417,7 +444,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
             context['import_warn'],
             context['import_ko'],
         ) = self.dry_run()
-        context['import_fields'] = ['ligne'] + self.champs
+        context['import_fields'] = ['ligne'] + self.champs_models
         context['model'] = models.Pouvoir
         return context
 
