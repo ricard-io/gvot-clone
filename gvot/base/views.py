@@ -1,10 +1,12 @@
 import csv
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, RedirectView, detail
 
+import dns.resolver
 from wagtail.admin import messages
 
 from . import forms, models
@@ -337,7 +339,7 @@ class ImportConfirm(FormInvalidMixin, FormView):
         for data, _ in datas:
             data.update({'ponderation': data.get('ponderation', 1) or 1})
 
-        return (
+        return [
             models.Pouvoir(
                 scrutin_id=self.scrutin_id,
                 **model_data,
@@ -349,11 +351,22 @@ class ImportConfirm(FormInvalidMixin, FormView):
                 ]
             )
             for model_data, other_data in datas
-        )
+        ]
+
+    def check_objects_mx(self, object_list):
+        domains = set([p.courriel.split('@')[-1] for p in object_list])
+        bad_mx_domains = {}
+        for domain in domains:
+            try:
+                dns.resolver.query(domain, 'MX')
+            except Exception as e:
+                bad_mx_domains[domain] = str(e)
+        return bad_mx_domains
 
     def crible_data(self):
         """Crible les lignes entre ce qu'on prend et ce qu'on rejette."""
         object_list = self.data_to_python()
+        bad_mx_domains = self.check_objects_mx(object_list)
         ok, warn, ko = [], [], []
 
         # champs identifiants (doublons)
@@ -402,6 +415,10 @@ class ImportConfirm(FormInvalidMixin, FormView):
                     warn.append((index, obj, warnings_msg[2]))
                 elif (obj.courriel,) in courriels_in_import:
                     warn.append((index, obj, warnings_msg[3]))
+
+                if obj.courriel.split('@')[-1] in bad_mx_domains:
+                    bad_mx_msg = "Expédition impossible : domaine en erreur."
+                    raise ValidationError({'courriel': bad_mx_msg})
 
                 if not warn or warn[-1][0] != index:
                     ok.append((index, obj, None))

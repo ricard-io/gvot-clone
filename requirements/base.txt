@@ -16,3 +16,7 @@ wagtailmenus >=3.0,<3.1  # https://github.com/rkhleics/wagtailmenus
 sphinx
 sphinx-rtd-theme
 django-docs
+
+# Utils
+# ------------------------------------------------------------------------------
+dnspython

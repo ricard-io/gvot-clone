@@ -25,4 +25,4 @@ def get_champ_perso(obj, key):
 @register.filter(name="get")
 def _get(obj, key):
     """Equivalent d'un get dans les templates."""
-    return obj.get(key, "")
+    return obj.get(key, "") if obj else None
