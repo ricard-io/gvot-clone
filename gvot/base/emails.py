@@ -10,6 +10,8 @@ from django.utils.http import urlencode
 
 from wagtail.core.templatetags.wagtailcore_tags import richtext
 
+from .validators import unescape_template_symbols
+
 
 def prepare_templated(request, template, context, embed=False):
     def autoescape(s):
@@ -35,10 +37,14 @@ def prepare_templated(request, template, context, embed=False):
                 r'href=\1{{ request.base_url }}/',
                 richtext(template.html),
             )
-            return Template(richtext(html)).render(Context(context))
+            return Template(unescape_template_symbols(richtext(html))).render(
+                Context(context)
+            )
         elif html and embed:
             # embedded preview
-            return Template(richtext(template.html)).render(Context(context))
+            return Template(
+                unescape_template_symbols(richtext(template.html))
+            ).render(Context(context))
         else:
             return Template(autoescape(template.texte)).render(
                 Context(context)
