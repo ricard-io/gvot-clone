@@ -1,5 +1,5 @@
 {% extends "./site_page.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags tapeforms %}
 
 {% block extra_head %}{{ block.super }}
   {{ form.media }}
@@ -22,13 +22,17 @@
 
     {% if page.ouvert or not page.vote_set.exists %}
       <article>
-        <form class="p-3" action="" method="post">
-          {% csrf_token %}
-          {{ form.as_tapeform }}
-          <div>
-            <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
-          </div>
-        </form>
+        {% block outer_form %}
+          <form class="p-3" action="" method="post">
+            {% csrf_token %}
+            {% block inner_form %}
+              {% form form using="tapeforms/layouts/gvot.html" %}
+            {% endblock %}
+            <div>
+              <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
+            </div>
+          </form>
+        {% endblock %}
       </article>
     {% endif %}
   {% endblock %}
@@ -38,4 +42,3 @@
     {{ page.prescription|richtext }}
   </div>
 {% endblock %}
-
