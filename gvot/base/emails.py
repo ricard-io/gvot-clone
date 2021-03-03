@@ -63,10 +63,12 @@ def prepare_templated(request, template, context, embed=False):
 
     subject = render_subject()
     message = render_message()
-    try:
-        html_message = render_message(html=True, insert_head=not embed)
-    except TemplateDoesNotExist:  # also TemplateSyntaxError
-        html_message = None
+    html_message = None
+    if template.html:
+        try:
+            html_message = render_message(html=True, insert_head=not embed)
+        except TemplateDoesNotExist:  # also TemplateSyntaxError
+            pass
 
     return subject, message, html_message
 
