@@ -94,13 +94,11 @@ class TestPouvoir:
         )
         assert count_text_in_content(
             response,
-            'value="Oui" class="form-control" required '
-            'id="id_approbation-du-rapport_0" checked>',
+            'value="Oui" required id="id_approbation-du-rapport_0" checked>',
         )
         assert count_text_in_content(
             response,
-            'value="Non" class="form-control" required '
-            'id="id_approbation-du-rapport_1">',
+            'value="Non" required id="id_approbation-du-rapport_1">',
         )
         assert count_text_in_content(
             response, "Ce scrutin n'est pas encore ouvert."
@@ -139,13 +137,11 @@ class TestPouvoir:
         )
         assert count_text_in_content(
             response,
-            'value="Oui" class="form-control" required '
-            'id="id_approbation-du-rapport_0" checked>',
+            'value="Oui" required id="id_approbation-du-rapport_0" checked>',
         )
         assert count_text_in_content(
             response,
-            'value="Non" class="form-control" required '
-            'id="id_approbation-du-rapport_1">',
+            'value="Non" required id="id_approbation-du-rapport_1">',
         )
         assert count_text_in_content(
             response, "Ce scrutin n'est pas encore ouvert."
@@ -166,13 +162,11 @@ class TestPouvoir:
         )
         assert count_text_in_content(
             response,
-            'value="Oui" class="form-control" required '
-            'id="id_approbation-du-rapport_0" checked>',
+            'value="Oui" required id="id_approbation-du-rapport_0" checked>',
         )
         assert count_text_in_content(
             response,
-            'value="Non" class="form-control" required '
-            'id="id_approbation-du-rapport_1">',
+            'value="Non" required id="id_approbation-du-rapport_1">',
         )
 
     def test_post_scrutin(self, client, pouvoir, mailoutbox):
@@ -214,11 +208,9 @@ class TestPouvoir:
         )
         assert count_text_in_content(
             response,
-            'value="Oui" class="form-control" required '
-            'id="id_approbation-du-rapport_0">',
+            'value="Oui" required id="id_approbation-du-rapport_0">',
         )
         assert count_text_in_content(
             response,
-            'value="Non" class="form-control" required '
-            'id="id_approbation-du-rapport_1" checked>',
+            'value="Non" required id="id_approbation-du-rapport_1" checked>',
         )
