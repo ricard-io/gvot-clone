@@ -23,7 +23,7 @@
     {% if page.ouvert or not page.vote_set.exists %}
       <article>
         {% block outer_form %}
-          <form class="p-3" action="" method="post">
+          <form class="p-3" method="post">
             {% csrf_token %}
             {% block inner_form %}
               {% form form using="tapeforms/layouts/gvot.html" %}
