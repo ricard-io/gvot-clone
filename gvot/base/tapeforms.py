@@ -29,5 +29,5 @@ class BigLabelTapeformMixin(FixBootstrapTapeformMixin):
     def get_field_container_css_class(self, bound_field):
         css_class = super().get_field_container_css_class(bound_field)
         if isinstance(bound_field.field.widget, forms.CheckboxInput):
-            return 'mt-4 ' + (css_class or "")  # avoid possible None
+            return 'pl-0 mt-4 ' + (css_class or "")  # avoid possible None
         return css_class
