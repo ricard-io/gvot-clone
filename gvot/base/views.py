@@ -321,10 +321,11 @@ class ImportConfirm(FormInvalidMixin, FormView):
     def data_to_python(self):
         """Réifie les données en objets Python et les soumet à validation."""
 
-        reader = csv.DictReader(self.csv_file)
+        reader = csv.reader(self.csv_file)
+        self.fieldnames = reader.__next__()
         self.champs_persos = [
             f
-            for f in reader.fieldnames
+            for f in self.fieldnames
             if f not in self.champs_models + self.champs_courriels
         ]
 
@@ -332,18 +333,19 @@ class ImportConfirm(FormInvalidMixin, FormView):
             (
                 {
                     k.strip(): v.strip() if isinstance(v, str) else v
-                    for k, v in r.items()
+                    for k, v in zip(self.fieldnames, r)
                     if isinstance(k, str) and k.strip() in self.champs_models
                 },
                 [
                     v.strip() if isinstance(v, str) else v
-                    for k, v in r.items()
+                    for k, v in zip(self.fieldnames, r)
                     if isinstance(k, str)
                     and k.strip() in self.champs_courriels
+                    and v
                 ],
                 [
                     (k.strip(), v.strip() if isinstance(v, str) else v)
-                    for k, v in r.items()
+                    for k, v in zip(self.fieldnames, r)
                     if isinstance(k, str)
                     and k.strip()
                     not in self.champs_models + self.champs_courriels
