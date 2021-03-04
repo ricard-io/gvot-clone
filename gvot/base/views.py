@@ -136,6 +136,8 @@ class MaillingIndex(FormInvalidMixin, FormView):
         # save data in session
         self.request.session['dests'] = form.cleaned_data['dests']
         self.request.session['template_id'] = form.cleaned_data['template'].id
+        self.request.session['filter_key'] = form.cleaned_data['filter_key']
+        self.request.session['filter_val'] = form.cleaned_data['filter_val']
         return super().form_valid(form)
 
     def get_error_message(self):
@@ -151,6 +153,8 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         super().setup(request, *args, **kwargs)
         self.dests = self.request.session.get('dests', None)
         self.template_id = self.request.session.get('template_id', None)
+        self.filter_key = self.request.session.get('filter_key', None)
+        self.filter_val = self.request.session.get('filter_val', None)
 
     def dispatch(self, request, *args, **kwargs):
         if (
@@ -168,6 +172,12 @@ class MaillingConfirm(FormInvalidMixin, FormView):
             self.qs = pouvoirs.exclude(vote__isnull=True)
         elif self.dests == 'abstenus':
             self.qs = pouvoirs.filter(vote__isnull=True)
+
+        if self.filter_key:
+            self.qs = pouvoirs.filter(
+                champ_perso__intitule=self.filter_key,
+                champ_perso__contenu=self.filter_val,
+            ).distinct()
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -192,6 +202,8 @@ class MaillingConfirm(FormInvalidMixin, FormView):
             context['dests'] = "tous les participants ayant voté"
         elif self.dests == 'abstenus':
             context['dests'] = "tous les participants n'ayant pas encore voté"
+        context['filter_key'] = self.filter_key
+        context['filter_val'] = self.filter_val
         context['preview'] = dict(
             zip(
                 ['subject', 'txt', 'html'],

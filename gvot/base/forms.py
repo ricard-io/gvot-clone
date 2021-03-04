@@ -26,6 +26,18 @@ class MaillingForm(forms.Form):
         ],
     )
 
+    filter_key = forms.ChoiceField(
+        choices=(),
+        required=False,
+        help_text="Filtre optionnellement les pouvoirs dont "
+        "le champ personnalisé désigné est égal à :",
+    )
+
+    filter_val = forms.CharField(
+        required=False,
+        max_length=255,
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -38,6 +50,21 @@ class MaillingForm(forms.Form):
                 [
                     (tpl.id, "{} : {}".format(scrutin, tpl.nom))
                     for tpl in scrutin.emailtemplate_set.spammable()
+                ],
+            )
+            for scrutin in Scrutin.objects.live().public()
+        ]
+
+        self.fields['filter_key'].choices = [
+            (None, "Filtrez selon un champ personnalisé")
+        ] + [
+            (
+                scrutin.title,
+                [
+                    (chp, "{} : {}".format(scrutin, chp))
+                    for chp in scrutin.pouvoir_set.values_list(
+                        'champ_perso__intitule', flat=True
+                    ).distinct()
                 ],
             )
             for scrutin in Scrutin.objects.live().public()

@@ -12,9 +12,10 @@
         <h2>Résumé</h2>
 
         <p>
-        Vous êtes sur le point d'envoyer un mailing à <strong>{{ dests }}</strong> au scrutin « {{ scrutin.title }} ».
+        Vous êtes sur le point d'envoyer un mailing à <strong>{{ dests }}</strong> au scrutin « {{ scrutin.title }} »{% if filter_key %}
+        dont le champ « <i>{{ filter_key }}</i> » est égal à « <i>{{ filter_val }}</i> »{% endif %}.
         </p>
-        <div class="help-block help-info">
+        <div class="help-block {% if nb %}help-info{% else %}help-critical{% endif %}">
           Cette action va engendrer une file de <strong>{{ nb }}</strong> courriel{{ nb | pluralize }}.
         </div>
         <hr>
