@@ -142,6 +142,9 @@ serve: ### démarre un serveur local pour l'application
 test: ### lance les tests de l'application
 	$(PYTHON) -m pytest --cov --cov-report=term:skip-covered
 
+devtest: ### lance les tests échoués de l'application
+	$(PYTHON) -m pytest --last-failed -s
+
 cov: test ### vérifie la couverture de code
 	$(PYTHON) -m coverage html
 	@echo open htmlcov/index.html
