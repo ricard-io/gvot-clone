@@ -21,19 +21,17 @@
     </div>
 
     {% if page.ouvert or not page.vote_set.exists %}
-      <article>
-        {% block outer_form %}
-          <form class="p-3" method="post">
-            {% csrf_token %}
-            {% block inner_form %}
-              {% form form using="tapeforms/layouts/gvot.html" %}
-            {% endblock %}
-            <div>
-              <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
-            </div>
-          </form>
-        {% endblock %}
-      </article>
+      {% block outer_form %}
+        <form class="p-3" method="post">
+          {% csrf_token %}
+          {% block inner_form %}
+            {% form form using="tapeforms/layouts/gvot.html" %}
+          {% endblock %}
+          <div>
+            <button class="btn btn-primary btn-lg btn-block" type="submit">{{ page.action }}</button>
+          </div>
+        </form>
+      {% endblock %}
     {% endif %}
   {% endblock %}
 
