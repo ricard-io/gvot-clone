@@ -27,6 +27,11 @@
                 </th>
               {% endif %}
             {% endfor %}
+            {% with field="courriels" %}
+              <th id="{{ field | slugify }}">
+                {{ field | title }}
+              </th>
+            {% endwith %}
             {% for field in extended_fields %}
               <th id="{{ field | slugify }}">
                 {{ field | title }}
@@ -62,6 +67,18 @@
                   {% endif %}
                 </td>
               {% endfor %}
+              {% with field="courriels_list" %}
+                <td>
+                  {{ pouvoir.courriels_list|join:", " | default_if_none:'-' | truncatechars:100 }}
+                  {% for error in exception.error_dict|get:"courriel" %}
+                    {% for message in error.messages %}
+                      <p class="error-message">
+                        {{ message }}
+                      </p>
+                    {% endfor %}
+                  {% endfor %}
+                </td>
+              {% endwith %}
               {% for field in extended_fields %}
                 <td>
                   {{ pouvoir | get_champ_perso:field | default_if_none:'-' | truncatechars:100 }}
@@ -94,6 +111,11 @@
                 </th>
               {% endif %}
             {% endfor %}
+            {% with field="courriels" %}
+              <th id="{{ field | slugify }}">
+                {{ field | title }}
+              </th>
+            {% endwith %}
             {% for field in extended_fields %}
               <th id="{{ field | slugify }}">
                 {{ field | title }}
@@ -118,6 +140,11 @@
                   {% endif %}
                 </td>
               {% endfor %}
+              {% with field="courriels_list" %}
+                <td>
+                  {{ pouvoir.courriels_list|join:", " | default_if_none:'-' | truncatechars:100 }}
+                </td>
+              {% endwith %}
               {% for field in extended_fields %}
                 <td>
                   {{ pouvoir | get_champ_perso:field | default_if_none:'-' | truncatechars:100 }}
@@ -147,6 +174,11 @@
                 </th>
               {% endif %}
             {% endfor %}
+            {% with field="courriels" %}
+              <th id="{{ field | slugify }}">
+                {{ field | title }}
+              </th>
+            {% endwith %}
             {% for field in extended_fields %}
               <th id="{{ field | slugify }}">
                 {{ field | title }}
@@ -166,6 +198,11 @@
                   {% endif %}
                 </td>
               {% endfor %}
+              {% with field="courriels_list" %}
+                <td>
+                  {{ pouvoir.courriels_list|join:", " | default_if_none:'-' | truncatechars:100 }}
+                </td>
+              {% endwith %}
               {% for field in extended_fields %}
                 <td>
                   {{ pouvoir | get_champ_perso:field | default_if_none:'-' | truncatechars:100 }}

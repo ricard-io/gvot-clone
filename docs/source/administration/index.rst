@@ -126,8 +126,8 @@ Le format d'entrée doit être un fichier « CSV » dans un codage utf-8 ;
 séparateur : « ``,`` » ; délimiteur de texte : « ``"`` » (doubles quotes). Un
 exemple est proposé au téléchargement.
 
-Les colonnes attendues sont : « nom », « prenom », « collectif » « courriel »,
-« contact » et « ponderation ».
+Les colonnes attendues sont : « nom », « prenom », « collectif » « courriel »
+et « ponderation ».
 
 Les colonnes « nom », « prenom » et « collectif » ne peuvent être vides toutes
 à la fois. Dit autrement le pouvoir doit au moins désigner un nom, un prénom
@@ -174,12 +174,14 @@ Le contexte des gabarits est notamment chargé avec les variables suivantes :
    ├── pouvoir
    │   ├── uuid
    │   ├── collectif
-   │   ├── contact
-   │   ├── courriel
    │   ├── nom
    │   ├── ponderation
    │   ├── prenom
    │   ├── uri
+   │   ├── courriels.0
+   │   ├── courriels.1
+   │   ├── courriels.2
+   │   ├── ...
    │   ├── champ_perso_1
    │   ├── champ_perso_2
    │   ├── champ_perso_3

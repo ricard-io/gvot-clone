@@ -464,10 +464,23 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
                 key=lambda x: x[0],
             )
         }
+        emails = {
+            uuid: [e for _, e in emails]
+            for uuid, emails in groupby(
+                qs.values_list(
+                    'courriels__pouvoir_id',
+                    'courriels__courriel',
+                )
+                .order_by('uuid')
+                .distinct(),
+                key=lambda x: x[0],
+            )
+        }
         return [
             {
                 **self.extract_champs_persos(champs_persos, d['uuid']),
                 **d,
+                'courriels': emails.get(d['uuid'], []),
                 'uri': reverse('uuid', args=(d['uuid'],)),
                 'scrutin': self.context_values(),
             }
@@ -514,6 +527,11 @@ class Scrutin(RoutablePageMixin, AbstractEmailForm):
         return dict(zip(headers, distribution))
 
 
+class Courriel(models.Model):
+    pouvoir = ParentalKey('Pouvoir', related_name='courriels')
+    courriel = models.EmailField()
+
+
 class ChampPersonnalise(models.Model):
     pouvoir = ParentalKey('Pouvoir', related_name='champ_perso')
     intitule = models.CharField(
@@ -538,13 +556,6 @@ class Pouvoir(ClusterableModel):
         help_text="Le pouvoir doit au moins désigner un nom, "
         "un prénom ou un nom de collectif.",
     )
-    courriel = models.EmailField()
-    contact = models.CharField(
-        "Contact alternatif en cas de courriel en erreur",
-        max_length=100,
-        null=True,
-        blank=True,
-    )
     ponderation = models.PositiveSmallIntegerField(
         "Pondération",
         default=1,
@@ -560,8 +571,12 @@ class Pouvoir(ClusterableModel):
             ],
             "Identité",
         ),
-        FieldPanel('courriel'),
-        FieldPanel('contact'),
+        MultiFieldPanel(
+            [
+                InlinePanel('courriels', label="Courriels", min_num=1),
+            ],
+            "Contacts",
+        ),
         MultiFieldPanel(
             [
                 InlinePanel(
@@ -588,6 +603,7 @@ class Pouvoir(ClusterableModel):
             return "{} {} ({})".format(self.prenom, self.nom, self.uuid)
         if self.nom or self.prenom:
             return "{} ({})".format(self.prenom or self.nom, self.uuid)
+        return str(self.uuid)
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -607,6 +623,9 @@ class Pouvoir(ClusterableModel):
     def context_values(self):
         qs = self._meta.model.objects.filter(pk=self.pk)
         return self.scrutin.pouvoir_context_values(qs)[0]
+
+    def courriels_list(self):
+        return self.courriels.values_list('courriel', flat=True)
 
 
 class EmailTemplateQuerySet(models.QuerySet):
@@ -690,9 +709,8 @@ class EmailTemplate(models.Model):
                 'scrutin': self.scrutin.context_values(),
                 'nom': request.user.last_name,
                 'prenom': request.user.first_name,
-                'courriel': request.user.email,
+                'courriels': [request.user.email],
                 'collectif': None,
-                'contact': None,
                 'ponderation': 1,
                 'uri': reverse('uuid', args=(uuid.uuid4(),)),
             }
@@ -703,7 +721,7 @@ class EmailTemplate(models.Model):
 
     def send_mailing(self, request, qs):
         datas = [
-            ({'pouvoir': d}, (d['courriel'],))
+            ({'pouvoir': d}, d['courriels'])
             for d in self.scrutin.pouvoir_context_values(qs)
         ]
         emails.send_mass_templated(request, self, None, datas)
@@ -711,9 +729,19 @@ class EmailTemplate(models.Model):
     def preview_mail(self, request, pouvoir):
         context = {'pouvoir': pouvoir.context_values()}
         return emails.preview_templated(
-            request, self, context, None, [pouvoir.courriel]
+            request,
+            self,
+            context,
+            None,
+            list(pouvoir.courriels_list()),
         )
 
     def send_mail(self, request, pouvoir):
         context = {'pouvoir': pouvoir.context_values()}
-        emails.send_templated(request, self, context, None, [pouvoir.courriel])
+        emails.send_templated(
+            request,
+            self,
+            context,
+            None,
+            list(pouvoir.courriels_list()),
+        )

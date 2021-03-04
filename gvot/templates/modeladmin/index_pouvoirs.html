@@ -1,6 +1,26 @@
 {% extends "modeladmin/index.html" %}
 {% load i18n modeladmin_tags %}
 
+{% block css %}
+    {{ block.super }}
+    <style>
+.inline-gvot {
+  max-height: 6em;
+  overflow-y: auto;
+}
+.inline-gvot dt:before {
+  content: "";
+  display: block;
+}
+.inline-gvot dt:after {
+  content: " : ";
+}
+.inline-gvot dt, .inline-gvot dd {
+  display: inline;
+}
+    </style>
+{% endblock %}
+
 {% block header_extra %}
     {% if user_can_create %}
         <div class="right">

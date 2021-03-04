@@ -1,5 +1,6 @@
 from django.urls import include, path, reverse
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from wagtail.contrib.forms.wagtail_hooks import FormsMenuItem
 from wagtail.contrib.modeladmin.helpers import ButtonHelper
@@ -78,18 +79,47 @@ class PouvoirAdmin(ModelAdmin):
     list_display = (
         'prenom',
         'nom',
+        'courriels',
         'collectif',
-        'courriel',
         'scrutin',
-        'contact',
         'ponderation',
+        'champs_perso',
     )
     list_filter = ('scrutin',)
     search_fields = [
-        s for s in list_display if s not in ['scrutin', 'ponderation']
+        'prenom',
+        'nom',
+        'collectif',
+        'courriels__courriel',
+        'champ_perso__contenu',
     ]
     index_template_name = 'modeladmin/index_pouvoirs.html'
     button_helper_class = PouvoirButtonHelper
+
+    def courriels(self, obj):
+        return mark_safe("<br>".join([str(c) for c in obj.courriels_list()]))
+
+    courriels.short_description = "Courriel(s)"
+
+    def champs_perso(self, obj):
+        return mark_safe(
+            "<dl class='inline-gvot'>{}</dl>".format(
+                "".join(
+                    [
+                        format_html(
+                            "<dt>{}</dt><dd>{}</dd>",
+                            i,
+                            c,
+                        )
+                        for i, c in obj.champ_perso.values_list(
+                            'intitule', 'contenu'
+                        )
+                    ]
+                )
+            )
+        )
+
+    champs_perso.short_description = "Champs personnalisés"
 
 
 @modeladmin_register

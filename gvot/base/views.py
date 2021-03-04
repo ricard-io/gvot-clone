@@ -185,7 +185,7 @@ class MaillingConfirm(FormInvalidMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['scrutin'] = self.template.scrutin
-        context['nb'] = self.qs.count()
+        context['nb'] = self.qs.values_list('courriels__courriel').count()
         if self.dests == 'tous':
             context['dests'] = "tous les participants"
         elif self.dests == 'exprimes':
@@ -241,9 +241,10 @@ class ImportConfirm(FormInvalidMixin, FormView):
         'nom',
         'prenom',
         'collectif',
-        'courriel',
-        'contact',
         'ponderation',
+    ]
+    champs_courriels = [
+        'courriel',
     ]
     champs_persos = []
 
@@ -288,6 +289,14 @@ class ImportConfirm(FormInvalidMixin, FormView):
             created = models.Pouvoir.objects.bulk_create(
                 [obj for _, obj, _ in ok + warn]
             )
+            models.Courriel.objects.bulk_create(
+                [
+                    courriel
+                    for pouvoir in created
+                    for courriel in pouvoir.courriels.all()
+                ]
+            )
+
             if self.champs_persos:
                 models.ChampPersonnalise.objects.bulk_create(
                     [
@@ -314,7 +323,9 @@ class ImportConfirm(FormInvalidMixin, FormView):
 
         reader = csv.DictReader(self.csv_file)
         self.champs_persos = [
-            f for f in reader.fieldnames if f not in self.champs_models
+            f
+            for f in reader.fieldnames
+            if f not in self.champs_models + self.champs_courriels
         ]
 
         datas = [
@@ -325,10 +336,17 @@ class ImportConfirm(FormInvalidMixin, FormView):
                     if isinstance(k, str) and k.strip() in self.champs_models
                 },
                 [
+                    v.strip() if isinstance(v, str) else v
+                    for k, v in r.items()
+                    if isinstance(k, str)
+                    and k.strip() in self.champs_courriels
+                ],
+                [
                     (k.strip(), v.strip() if isinstance(v, str) else v)
                     for k, v in r.items()
                     if isinstance(k, str)
-                    and k.strip() not in self.champs_models
+                    and k.strip()
+                    not in self.champs_models + self.champs_courriels
                     and v
                 ],
             )
@@ -336,13 +354,17 @@ class ImportConfirm(FormInvalidMixin, FormView):
         ]
 
         # Par défaut on force les ponderation vides ou inexistantes à 1
-        for data, _ in datas:
+        for data, _, _ in datas:
             data.update({'ponderation': data.get('ponderation', 1) or 1})
 
         return [
             models.Pouvoir(
                 scrutin_id=self.scrutin_id,
                 **model_data,
+                courriels=[
+                    models.Courriel(courriel=courriel)
+                    for courriel in courriel_data
+                ],
                 champ_perso=[
                     models.ChampPersonnalise(
                         intitule=intitule, contenu=contenu
@@ -350,11 +372,13 @@ class ImportConfirm(FormInvalidMixin, FormView):
                     for intitule, contenu in other_data
                 ]
             )
-            for model_data, other_data in datas
+            for model_data, courriel_data, other_data in datas
         ]
 
     def check_objects_mx(self, object_list):
-        domains = set([p.courriel.split('@')[-1] for p in object_list])
+        domains = set(
+            [c.split('@')[-1] for p in object_list for c in p.courriels_list()]
+        )
         bad_mx_domains = {}
         for domain in domains:
             try:
@@ -370,11 +394,13 @@ class ImportConfirm(FormInvalidMixin, FormView):
         ok, warn, ko = [], [], []
 
         # champs identifiants (doublons)
-        id_fields = ('nom', 'prenom', 'collectif', 'courriel')
+        id_fields = ('nom', 'prenom', 'collectif')
 
-        courriels_in_db = models.Pouvoir.objects.filter(
-            scrutin_id=self.scrutin_id
-        ).values_list('courriel')
+        courriels_in_db = (
+            models.Pouvoir.objects.filter(scrutin_id=self.scrutin_id)
+            .values_list('courriels__courriel')
+            .distinct()
+        )
         pouvoirs_in_db = models.Pouvoir.objects.filter(
             scrutin_id=self.scrutin_id
         ).values_list(*id_fields)
@@ -393,36 +419,57 @@ class ImportConfirm(FormInvalidMixin, FormView):
 
         for index, obj in enumerate(object_list):
             try:
-                if not any(
-                    [
-                        getattr(obj, f)
-                        for f in self.champs_models
-                        if f != 'ponderation'
-                    ]
+                # detect empty lines
+                if (
+                    not any(
+                        (
+                            getattr(obj, f)
+                            for f in self.champs_models
+                            if f != 'ponderation'
+                        )
+                    )
+                    and not obj.courriels.exists()
+                    and not obj.champ_perso.exists()
                 ):
                     continue  # drop empty line
 
+                # raise validation errors
                 obj.full_clean()
+                [
+                    courriel.full_clean(exclude=['pouvoir'])
+                    for courriel in obj.courriels.all()
+                ]
+
+                if any(
+                    (
+                        c.split('@')[-1] in bad_mx_domains
+                        for c in obj.courriels_list()
+                    )
+                ):
+                    bad_mx_msg = "Expédition impossible : domaine en erreur."
+                    raise ValidationError({'courriel': bad_mx_msg})
 
                 signature = tuple([getattr(obj, f) for f in id_fields])
 
                 if not self.remplace and signature in pouvoirs_in_db:
                     warn.append((index, obj, warnings_msg[0]))
-                elif not self.remplace and (obj.courriel,) in courriels_in_db:
+                elif not self.remplace and any(
+                    (c in courriels_in_db for c in obj.courriels_list())
+                ):
                     warn.append((index, obj, warnings_msg[1]))
 
                 if signature in pouvoirs_in_import:
                     warn.append((index, obj, warnings_msg[2]))
-                elif (obj.courriel,) in courriels_in_import:
+                elif any(
+                    (c in courriels_in_import for c in obj.courriels_list())
+                ):
                     warn.append((index, obj, warnings_msg[3]))
-
-                if obj.courriel.split('@')[-1] in bad_mx_domains:
-                    bad_mx_msg = "Expédition impossible : domaine en erreur."
-                    raise ValidationError({'courriel': bad_mx_msg})
 
                 if not warn or warn[-1][0] != index:
                     ok.append((index, obj, None))
-                    courriels_in_import.add((obj.courriel,))
+                    courriels_in_import = courriels_in_import.union(
+                        set(obj.courriels_list())
+                    )
                     pouvoirs_in_import.add(signature)
             except Exception as exception:
                 ko.append((index, obj, exception))

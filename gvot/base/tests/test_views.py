@@ -194,6 +194,7 @@ class TestPouvoir:
             "Nous avons bien enregistré votre vote pour le scrutin"
             in mailoutbox[0].body
         )
+        assert mailoutbox[0].to == list(pouvoir.courriels_list())
 
         # Après le vote
         response = client.get(url, follow=True)

@@ -7,7 +7,7 @@ from wagtail.core.models import Site
 from wagtail.documents.models import get_document_model
 from wagtail.images.tests.utils import Image, get_test_image_file
 
-from ..models import Scrutin, ScrutinIndex
+from ..models import Courriel, Scrutin, ScrutinIndex
 
 
 @pytest.fixture
@@ -74,5 +74,5 @@ def scrutin(admin, liste_scrutin):
 @pytest.fixture
 def pouvoir(scrutin):
     return scrutin.pouvoir_set.create(
-        prenom="Jean", nom="Bon", courriel="jean@bon.fr"
+        prenom="Jean", nom="Bon", courriels=[Courriel(courriel="jean@bon.fr")]
     )
