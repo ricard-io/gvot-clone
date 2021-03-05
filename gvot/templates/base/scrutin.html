@@ -12,7 +12,7 @@
   {% elif not page.ouvert and page.vote_set.exists %}
     <div class="alert alert-danger"><i class="fa fa-warning mr-2"></i>Ce scrutin est désormais fermé. Veuillez vous rapprochez des organisateurs en cas de problème.</div>
   {% elif page.ouvert and deja_vote %}
-    <div class="alert alert-info"><i class="fa fa-lightbulb-o mr-2"></i>Il semble que vous ayez déjà voté. Vous pouvez contrôler votre vote et le corriger jusque la fermeture du scrutin.</div>
+    <div class="alert alert-info"><i class="fa fa-lightbulb-o mr-2"></i>Il semble que vous ayez déjà voté. Vous pouvez contrôler votre vote et le corriger jusqu'à la fermeture du scrutin.</div>
   {% endif %}
 
   {% block inner_content %}

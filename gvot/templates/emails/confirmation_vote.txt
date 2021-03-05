@@ -3,7 +3,7 @@ Bonjour{% if pouvoir.prenom %} {{ pouvoir.prenom }}{% endif %}{% if pouvoir.nom 
 Nous avons bien enregistré votre vote pour le scrutin
 « {{ pouvoir.scrutin.title }} ».
 
-Vous pouvez à tout moment jusque la fin du scrutin retrouver votre contribution
+Vous pouvez à tout moment jusqu'à la fin du scrutin retrouver votre contribution
 et éventuellement la corriger à cette adresse :
 {{ request.base_url }}{{ pouvoir.uri }}
 
