@@ -2,6 +2,7 @@ import csv
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, RedirectView, detail
@@ -137,6 +138,7 @@ class MaillingIndex(FormInvalidMixin, FormView):
         self.request.session['dests'] = form.cleaned_data['dests']
         self.request.session['template_id'] = form.cleaned_data['template'].id
         self.request.session['filter_key'] = form.cleaned_data['filter_key']
+        self.request.session['filter_ope'] = form.cleaned_data['filter_ope']
         self.request.session['filter_val'] = form.cleaned_data['filter_val']
         return super().form_valid(form)
 
@@ -154,6 +156,7 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         self.dests = self.request.session.get('dests', None)
         self.template_id = self.request.session.get('template_id', None)
         self.filter_key = self.request.session.get('filter_key', None)
+        self.filter_ope = self.request.session.get('filter_ope', None)
         self.filter_val = self.request.session.get('filter_val', None)
 
     def dispatch(self, request, *args, **kwargs):
@@ -174,10 +177,51 @@ class MaillingConfirm(FormInvalidMixin, FormView):
             self.qs = pouvoirs.filter(vote__isnull=True)
 
         if self.filter_key:
-            self.qs = pouvoirs.filter(
-                champ_perso__intitule=self.filter_key,
-                champ_perso__contenu=self.filter_val,
-            ).distinct()
+            if self.filter_ope in [
+                'icontains',
+                'iendswith',
+                'iexact',
+                'istartswith',
+            ]:
+                filtre = Q(champ_perso__intitule=self.filter_key) & Q(
+                    **{
+                        'champ_perso__contenu__'
+                        + self.filter_ope: self.filter_val
+                    }
+                )
+            elif self.filter_ope in [
+                'not_icontains',
+                'not_iendswith',
+                'not_iexact',
+                'not_istartswith',
+            ]:
+                filtre = Q(champ_perso__intitule=self.filter_key) & ~Q(
+                    **{
+                        'champ_perso__contenu__'
+                        + self.filter_ope[4:]: self.filter_val
+                    }
+                )
+            elif self.filter_ope in [
+                'empty_not_icontains',
+                'empty_not_iendswith',
+                'empty_not_iexact',
+                'empty_not_istartswith',
+            ]:
+                filtre = ~Q(champ_perso__intitule=self.filter_key) | (
+                    Q(champ_perso__intitule=self.filter_key)
+                    & ~Q(
+                        **{
+                            'champ_perso__contenu__'
+                            + self.filter_ope[10:]: self.filter_val
+                        }
+                    )
+                )
+            elif self.filter_ope == 'isempty':
+                filtre = ~Q(champ_perso__intitule=self.filter_key)
+            elif self.filter_ope == 'not_isempty':
+                filtre = Q(champ_perso__intitule=self.filter_key)
+
+            self.qs = pouvoirs.filter(filtre).distinct()
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -189,13 +233,19 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         # drop now obsolete session data
         self.request.session.pop('dests', False)
         self.request.session.pop('template_id', False)
+        self.request.session.pop('filter_key', False)
+        self.request.session.pop('filter_ope', False)
+        self.request.session.pop('filter_val', False)
 
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['scrutin'] = self.template.scrutin
-        context['nb'] = self.qs.values_list('courriels__courriel').count()
+        context['qs'] = self.qs
+        context['nb_dests'] = self.qs.values_list(
+            'courriels__courriel'
+        ).count()
         if self.dests == 'tous':
             context['dests'] = "tous les participants"
         elif self.dests == 'exprimes':
@@ -203,6 +253,11 @@ class MaillingConfirm(FormInvalidMixin, FormView):
         elif self.dests == 'abstenus':
             context['dests'] = "tous les participants n'ayant pas encore voté"
         context['filter_key'] = self.filter_key
+        context['filter_ope'] = (
+            dict(forms.MaillingForm.declared_fields['filter_ope'].choices)
+            .get(self.filter_ope)
+            .lower()
+        )
         context['filter_val'] = self.filter_val
         context['preview'] = dict(
             zip(

@@ -29,14 +29,58 @@ class MaillingForm(forms.Form):
     filter_key = forms.ChoiceField(
         choices=(),
         required=False,
-        help_text="Filtre optionnellement les pouvoirs dont "
-        "le champ personnalisé désigné est égal à :",
+    )
+
+    filter_ope = forms.ChoiceField(
+        choices=(
+            (None, "Choississez une opération de filtrage"),
+            ('icontains', "Contient"),
+            ('istartswith', "Commence par"),
+            ('iendswith', "Termine par"),
+            ('iexact', "Est"),
+            ('not_isempty', "Est défini"),
+            ('not_icontains', "Est défini et ne contient pas"),
+            ('not_istartswith', "Est défini et ne commence pas par"),
+            ('not_iendswith', "Est défini et ne termine pas par"),
+            ('not_iexact', "Est défini et est différent de"),
+            ('isempty', "N'est pas défini"),
+            ('empty_not_icontains', "N'est pas défini ou ne contient pas"),
+            (
+                'empty_not_istartswith',
+                "N'est pas défini ou ne commence pas par",
+            ),
+            ('empty_not_iendswith', "N'est pas défini ou ne termine pas par"),
+            ('empty_not_iexact', "N'est pas défini ou est différent de"),
+        ),
+        required=False,
     )
 
     filter_val = forms.CharField(
         required=False,
         max_length=255,
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('filter_key') and not cleaned_data.get(
+            'filter_ope'
+        ):
+            self.add_error(
+                'filter_ope',
+                ValidationError(
+                    "Veuillez définir l'opération de filtrage à appliquer"
+                ),
+            )
+        if cleaned_data.get('filter_ope') and not cleaned_data.get(
+            'filter_key'
+        ):
+            self.add_error(
+                'filter_key',
+                ValidationError(
+                    "Veuillez définir à quel champ s'applique le filtre"
+                ),
+            )
+        return cleaned_data
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

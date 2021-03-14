@@ -133,7 +133,8 @@ Les colonnes « nom », « prenom » et « collectif » ne peuvent être v
 à la fois. Dit autrement le pouvoir doit au moins désigner un nom, un prénom
 ou un nom de collectif.
 
-La colonne « courriel » ne peut être vide.
+La colonne « courriel » ne peut être vide. Plusieurs colonnes « courriel »
+peuvent être présentes.
 
 Une pondération absente sera interprétée à la valeur « 1 ».
 
@@ -262,8 +263,12 @@ Expédition d'un mailing
 Vous pouvez démarrer un mailing d'annonce, directement depuis le panel
 « Pouvoirs ».
 
+Il est possible de filtrer les destinataires concernés selon plusieurs
+critères : ayant voté ou non, ayant tel attribut défini ou non,
+à quelle valeur, etc.
+
 Une fois les modalités d'envoi définies, une confirmation avec
-prévisualisation du mailing vous sera présentée.
+prévisualisation du mailing et de ses destinataires vous sera présentée.
 
 .. note::
 

@@ -7,20 +7,19 @@
   {% include "wagtailadmin/shared/header.html" with title="Démarrer un mailing" icon="mail" subtitle=" Analyse du mailing avant validation" %}
 
 <div class="nice-padding">
-  <div class="overflow">
     <section>
         <h2>Résumé</h2>
-
         <p>
         Vous êtes sur le point d'envoyer un mailing à <strong>{{ dests }}</strong> au scrutin « {{ scrutin.title }} »{% if filter_key %}
-        dont le champ « <i>{{ filter_key }}</i> » est égal à « <i>{{ filter_val }}</i> »{% endif %}.
+        dont le champ « <strong>{{ filter_key }}</strong> » {{ filter_ope }}{% if "défini" not in filter_ope %} « <strong>{{ filter_val }}</strong> »{% endif %}{% endif %}.
         </p>
         <div class="help-block {% if nb %}help-info{% else %}help-critical{% endif %}">
-          Cette action va engendrer une file de <strong>{{ nb }}</strong> courriel{{ nb | pluralize }}.
+          Cette action va engendrer une file de <strong>{{ qs.count }}</strong> courriel{{ qs.count | pluralize }} à <strong>{{ nb_dests }}</strong> destinataire{{ nb_dests | pluralize }}.
         </div>
         <hr>
         <h2>Prévisualisation de l'email</h2>
         <h3>Sujet : {{ preview.subject }}</h3>
+        <div class="row row-flush">
         {% if preview.html %}
           <div class="col6">
             <h3 style="background: #e6e6e6; padding: 1em; margin-bottom: 1em;">Version texte</h3>
@@ -34,8 +33,31 @@
           </div>
         {% endif %}
         </ul>
+        </div>
       </section>
-  </div>
+    <section>
+    <hr>
+    <h2>Prévisualisation de la liste des destinataires</h2>
+    <ul class="listing">
+      {% for pouvoir in qs %}
+      <li>
+        <div class="row row-flush">
+          <div class="col4 title">
+            <a href="{% url "base_pouvoir_modeladmin_edit" pouvoir.pk %}">
+              {{ pouvoir.nom | default_if_none:'' }}
+              {{ pouvoir.prenom | default_if_none:'' }}
+              {% if pouvoir.nom or pouvoir.prenom %}{% if pouvoir.collectif %}&ndash;{% endif %}{% endif %}
+              {{ pouvoir.collectif }}
+            </a>
+          </div>
+          <div class="col8">
+            {{ pouvoir.courriels_list | join:", " | default_if_none:'-' | truncatechars:100 }}
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    </section>
 </div>
 
 <form action="" method="POST" novalidate>
@@ -45,8 +67,8 @@
     <ul>
       <li class="actions">
         <div class="dropdown dropup dropdown-button match-width">
-          <button type="submit" class="button action-save button-longrunning{% if import_ko %} disabled{% endif %}" data-clicked-text="Envoyer le mailing">
-            <span class="icon icon-spinner"></span><em>{% if import_ko %}Impossible d'{% endif %}Envoyer le mailing</em>
+          <button type="submit" class="button action-save button-longrunning" data-clicked-text="Envoyer le mailing">
+            <span class="icon icon-spinner"></span><em>Envoyer le mailing</em>
           </button>
         </div>
       </li>
