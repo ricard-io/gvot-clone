@@ -14,7 +14,7 @@ Pour voter, visitez simplement le site suivant et suivez les instructions :
 {% endif %}
 À l'issue de votre participation, un courriel de confirmation vous sera renvoyé.
 
-Vous pourrez à tout moment et jusque la fin du scrutin retrouver votre
+Vous pourrez à tout moment et jusqu'à la fin du scrutin retrouver votre
 contribution et éventuellement la corriger à cette même adresse.
 
 Merci pour votre participation.
